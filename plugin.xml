@@ -133,6 +133,13 @@
             class="io.github.airwaves778899.claudecode.actions.OpenChatViewAction"
             enablesFor="+">
          </action>
+         <action
+            id="io.github.airwaves778899.claudecode.action.openCliTerminal"
+            label="Open Claude CLI Terminal"
+            icon="icons/claude.png"
+            class="io.github.airwaves778899.claudecode.actions.OpenClaudeCliTerminalAction"
+            enablesFor="1">
+         </action>
       </objectContribution>
 
    </extension>
