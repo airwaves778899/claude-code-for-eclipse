@@ -1,4 +1,4 @@
-﻿package io.github.airwaves778899.claudecode.handlers;
+package io.github.airwaves778899.claudecode.handlers;
 
 import java.io.File;
 

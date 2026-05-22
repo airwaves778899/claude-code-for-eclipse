@@ -1,4 +1,4 @@
-﻿package io.github.airwaves778899.claudecode.mcp;
+package io.github.airwaves778899.claudecode.mcp;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;

@@ -1,4 +1,4 @@
-﻿package io.github.airwaves778899.claudecode.apply;
+package io.github.airwaves778899.claudecode.apply;
 
 import java.util.ArrayList;
 import java.util.Arrays;

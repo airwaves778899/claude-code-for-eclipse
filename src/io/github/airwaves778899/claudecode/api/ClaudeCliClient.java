@@ -1,4 +1,4 @@
-﻿package io.github.airwaves778899.claudecode.api;
+package io.github.airwaves778899.claudecode.api;
 
 import java.io.BufferedReader;
 import java.io.IOException;

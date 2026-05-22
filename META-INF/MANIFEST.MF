@@ -1,4 +1,4 @@
-﻿Manifest-Version: 1.0
+Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Claude Code for Eclipse
 Bundle-SymbolicName: io.github.airwaves778899.claudecode;singleton:=true

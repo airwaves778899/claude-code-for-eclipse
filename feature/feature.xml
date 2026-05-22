@@ -21,8 +21,8 @@
    </license>
 
    <url>
-      <update label="Claude Code for Eclipse Update Site" url="https://holtek.github.io/claude-code-eclipse/updatesite/"/>
-      <discovery label="Claude Code for Eclipse" url="https://holtek.github.io/claude-code-eclipse/updatesite/"/>
+      <update label="Claude Code for Eclipse Update Site" url="https://airwaves778899.github.io/claude-code-for-eclipse/updatesite/"/>
+      <discovery label="Claude Code for Eclipse" url="https://airwaves778899.github.io/claude-code-for-eclipse/updatesite/"/>
    </url>
 
    <requires>

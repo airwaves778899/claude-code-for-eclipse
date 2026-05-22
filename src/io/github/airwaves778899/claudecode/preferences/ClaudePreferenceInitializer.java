@@ -1,4 +1,4 @@
-﻿package io.github.airwaves778899.claudecode.preferences;
+package io.github.airwaves778899.claudecode.preferences;
 
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.jface.preference.IPreferenceStore;

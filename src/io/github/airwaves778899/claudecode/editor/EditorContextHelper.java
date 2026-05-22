@@ -1,4 +1,4 @@
-﻿package io.github.airwaves778899.claudecode.editor;
+package io.github.airwaves778899.claudecode.editor;
 
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextSelection;

@@ -1,4 +1,4 @@
-﻿package io.github.airwaves778899.claudecode.handlers;
+package io.github.airwaves778899.claudecode.handlers;
 
 /**
  * "Explain Code" — asks Claude to explain what the selected code does.

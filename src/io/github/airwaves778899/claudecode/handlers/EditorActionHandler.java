@@ -1,4 +1,4 @@
-﻿package io.github.airwaves778899.claudecode.handlers;
+package io.github.airwaves778899.claudecode.handlers;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;

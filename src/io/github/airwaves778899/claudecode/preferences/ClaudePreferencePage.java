@@ -1,4 +1,4 @@
-﻿package io.github.airwaves778899.claudecode.preferences;
+package io.github.airwaves778899.claudecode.preferences;
 
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.swt.SWT;

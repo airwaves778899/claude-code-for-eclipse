@@ -1,4 +1,4 @@
-﻿package io.github.airwaves778899.claudecode.views;
+package io.github.airwaves778899.claudecode.views;
 
 import java.util.ArrayList;
 import java.util.Collections;

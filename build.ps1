@@ -35,7 +35,9 @@ $CP_PATTERNS = @(
     "org.eclipse.ui.editors_*","org.eclipse.ui.workbench.texteditor_*",
     "org.eclipse.text_*","org.eclipse.core.commands_*",
     "org.eclipse.equinox.preferences_*","org.eclipse.equinox.app_*","org.eclipse.equinox.common_*",
-    "org.eclipse.equinox.registry_*","org.eclipse.osgi_*","org.eclipse.core.jobs_*"
+    "org.eclipse.equinox.registry_*","org.eclipse.osgi_*","org.eclipse.core.jobs_*",
+    "org.eclipse.ui.console_*","org.eclipse.debug.core_*","org.eclipse.debug.ui_*",
+    "org.eclipse.osgi.services_*","org.osgi.service.prefs_*"
 )
 $CP_LIST = @()
 foreach ($p in $CP_PATTERNS) {

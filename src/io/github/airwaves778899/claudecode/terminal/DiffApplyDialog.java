@@ -1,4 +1,4 @@
-﻿package io.github.airwaves778899.claudecode.terminal;
+package io.github.airwaves778899.claudecode.terminal;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;

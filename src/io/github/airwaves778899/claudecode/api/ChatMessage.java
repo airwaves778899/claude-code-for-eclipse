@@ -1,4 +1,4 @@
-﻿package io.github.airwaves778899.claudecode.api;
+package io.github.airwaves778899.claudecode.api;
 
 /**
  * Represents a single message in a Claude conversation.

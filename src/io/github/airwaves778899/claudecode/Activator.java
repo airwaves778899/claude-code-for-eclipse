@@ -1,4 +1,4 @@
-﻿package io.github.airwaves778899.claudecode;
+package io.github.airwaves778899.claudecode;
 
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;

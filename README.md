@@ -41,7 +41,7 @@ An Eclipse IDE plugin that integrates [Claude Code CLI](https://docs.anthropic.c
 1. Go to **Help → Install New Software…**
 2. Click **Add…** and enter:
    - Name: `Claude Code for Eclipse`
-   - Location: `https://your-github-pages-url/updatesite/`
+   - Location: `https://airwaves778899.github.io/claude-code-for-eclipse/updatesite/`
 3. Select **Claude Code for Eclipse** and click **Next** to install
 
 ---

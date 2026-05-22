@@ -1,4 +1,4 @@
-﻿package io.github.airwaves778899.claudecode.handlers;
+package io.github.airwaves778899.claudecode.handlers;
 
 /**
  * "Generate Tests" — asks Claude to write unit tests for the selected code.

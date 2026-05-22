@@ -1,4 +1,4 @@
-﻿package io.github.airwaves778899.claudecode.context;
+package io.github.airwaves778899.claudecode.context;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;

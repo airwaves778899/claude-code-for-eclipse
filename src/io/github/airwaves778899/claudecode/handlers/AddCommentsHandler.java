@@ -1,4 +1,4 @@
-﻿package io.github.airwaves778899.claudecode.handlers;
+package io.github.airwaves778899.claudecode.handlers;
 
 /**
  * "Add Comments" — asks Claude to add Javadoc and inline comments.

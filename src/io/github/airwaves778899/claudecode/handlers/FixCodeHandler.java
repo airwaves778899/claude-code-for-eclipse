@@ -1,4 +1,4 @@
-﻿package io.github.airwaves778899.claudecode.handlers;
+package io.github.airwaves778899.claudecode.handlers;
 
 /**
  * "Fix / Improve Code" — asks Claude to find bugs and suggest improvements.

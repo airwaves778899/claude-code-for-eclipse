@@ -1,4 +1,4 @@
-﻿package io.github.airwaves778899.claudecode.api;
+package io.github.airwaves778899.claudecode.api;
 
 import java.net.URI;
 import java.net.http.HttpClient;

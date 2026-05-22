@@ -1,4 +1,4 @@
-﻿package io.github.airwaves778899.claudecode.api;
+package io.github.airwaves778899.claudecode.api;
 
 /**
  * Callback interface for streaming responses from the Anthropic API.

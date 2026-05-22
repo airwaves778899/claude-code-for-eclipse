@@ -1,4 +1,4 @@
-﻿package io.github.airwaves778899.claudecode.dialogs;
+package io.github.airwaves778899.claudecode.dialogs;
 
 import java.io.File;
 import java.util.ArrayList;

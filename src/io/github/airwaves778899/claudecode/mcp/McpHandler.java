@@ -1,4 +1,4 @@
-﻿package io.github.airwaves778899.claudecode.mcp;
+package io.github.airwaves778899.claudecode.mcp;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

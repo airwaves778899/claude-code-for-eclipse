@@ -1,4 +1,4 @@
-﻿package io.github.airwaves778899.claudecode.context;
+package io.github.airwaves778899.claudecode.context;
 
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;

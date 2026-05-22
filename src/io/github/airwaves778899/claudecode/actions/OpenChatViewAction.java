@@ -1,4 +1,4 @@
-﻿package io.github.airwaves778899.claudecode.actions;
+package io.github.airwaves778899.claudecode.actions;
 
 import java.io.File;
 

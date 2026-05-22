@@ -1,4 +1,4 @@
-﻿package io.github.airwaves778899.claudecode.apply;
+package io.github.airwaves778899.claudecode.apply;
 
 /**
  * Represents a single fenced code block extracted from a Claude response.

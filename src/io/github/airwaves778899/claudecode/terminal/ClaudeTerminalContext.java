@@ -1,4 +1,4 @@
-﻿package io.github.airwaves778899.claudecode.terminal;
+package io.github.airwaves778899.claudecode.terminal;
 
 import java.util.Collections;
 import java.util.List;
