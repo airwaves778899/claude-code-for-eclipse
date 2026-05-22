@@ -1,4 +1,4 @@
-﻿# Claude Code for Eclipse
+# Claude Code for Eclipse
 
 An Eclipse IDE plugin that integrates [Claude Code CLI](https://docs.anthropic.com/en/docs/claude-code/overview) directly into your workspace. No API key required — uses your locally installed and authenticated `claude` CLI as the backend.
 
