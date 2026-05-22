@@ -1,0 +1,24 @@
+# Compiled output
+bin/
+*.class
+
+# Build artifacts
+build/
+*.jar
+
+# Generated p2 Update Site (regenerate with: .\build.ps1 -UpdateSite)
+updatesite/
+
+# Eclipse workspace metadata
+.settings/
+.classpath
+.project
+*.launch
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE files
+*.iml
+.idea/

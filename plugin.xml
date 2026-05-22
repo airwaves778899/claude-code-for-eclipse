@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+
+   <!-- ============================================================ -->
+   <!--  Commands                                                    -->
+   <!-- ============================================================ -->
+   <extension point="org.eclipse.ui.commands">
+
+      <command
+         id="com.holtek.claudecode.commands.openChatView"
+         name="Open Claude Chat"
+         description="Open Claude Chat view in Eclipse">
+      </command>
+
+      <command
+         id="com.holtek.claudecode.commands.openChatViewForProject"
+         name="Open Claude Chat Here"
+         description="Open Claude Chat view at selected project">
+      </command>
+
+      <command
+         id="com.holtek.claudecode.commands.askClaudeAboutSelection"
+         name="Ask Claude about selection"
+         description="Send selected code to Claude Chat">
+      </command>
+
+   </extension>
+
+   <!-- ============================================================ -->
+   <!--  Handlers                                                    -->
+   <!-- ============================================================ -->
+   <extension point="org.eclipse.ui.handlers">
+
+      <handler
+         commandId="com.holtek.claudecode.commands.openChatView"
+         class="com.holtek.claudecode.handlers.OpenChatViewHandler">
+      </handler>
+
+      <handler
+         commandId="com.holtek.claudecode.commands.openChatViewForProject"
+         class="com.holtek.claudecode.handlers.OpenChatViewForProjectHandler">
+      </handler>
+
+      <handler
+         commandId="com.holtek.claudecode.commands.askClaudeAboutSelection"
+         class="com.holtek.claudecode.handlers.AskClaudeAboutSelectionHandler">
+         <activeWhen>
+            <with variable="activeEditor">
+               <adapt type="org.eclipse.ui.texteditor.ITextEditor"/>
+            </with>
+         </activeWhen>
+      </handler>
+
+   </extension>
+
+   <!-- ============================================================ -->
+   <!--  Views                                                       -->
+   <!-- ============================================================ -->
+   <extension point="org.eclipse.ui.views">
+
+      <view
+         id="com.holtek.claudecode.views.ClaudeTerminalView"
+         name="Claude Chat"
+         class="com.holtek.claudecode.views.ClaudeTerminalView"
+         allowMultiple="false">
+      </view>
+
+   </extension>
+
+   <!-- ============================================================ -->
+   <!--  Menus (toolbar + menu bar)                                  -->
+   <!-- ============================================================ -->
+   <extension point="org.eclipse.ui.menus">
+
+      <!-- Toolbar button -->
+      <menuContribution locationURI="toolbar:org.eclipse.ui.main.toolbar">
+         <toolbar id="com.holtek.claudecode.toolbar">
+            <command
+               commandId="com.holtek.claudecode.commands.openChatView"
+               icon="icons/claude.png"
+               tooltip="Open Claude Chat  (Alt+Shift+C)">
+            </command>
+         </toolbar>
+      </menuContribution>
+
+      <!-- Main menu bar -->
+      <menuContribution locationURI="menu:org.eclipse.ui.main.menu?after=window">
+         <menu id="com.holtek.claudecode.menu" label="Claude">
+            <command
+               commandId="com.holtek.claudecode.commands.openChatView"
+               label="Open Claude Chat  (Alt+Shift+C)"
+               icon="icons/claude.png">
+            </command>
+         </menu>
+      </menuContribution>
+
+      <!-- Editor right-click context menu: Ask Claude about selection -->
+      <menuContribution locationURI="popup:org.eclipse.ui.popup.any?after=additions">
+         <command
+            commandId="com.holtek.claudecode.commands.askClaudeAboutSelection"
+            label="Ask Claude about selection"
+            icon="icons/claude.png"
+            style="push">
+            <visibleWhen checkEnabled="false">
+               <with variable="activeEditor">
+                  <adapt type="org.eclipse.ui.texteditor.ITextEditor"/>
+               </with>
+            </visibleWhen>
+         </command>
+      </menuContribution>
+
+   </extension>
+
+   <!-- ============================================================ -->
+   <!--  Popup Menus (Package/Project Explorer)                      -->
+   <!-- ============================================================ -->
+   <extension point="org.eclipse.ui.popupMenus">
+
+      <!--
+         adaptable="true"  is essential: Package/Project Explorer nodes
+         are IAdaptable objects, not IProject directly.  Without this
+         flag Eclipse skips the adapter chain and never matches.
+      -->
+      <objectContribution
+         id="com.holtek.claudecode.projectPopup"
+         objectClass="org.eclipse.core.resources.IProject"
+         adaptable="true">
+         <action
+            id="com.holtek.claudecode.action.openChatHere"
+            label="Open Claude Chat Here"
+            icon="icons/claude.png"
+            class="com.holtek.claudecode.actions.OpenChatViewAction"
+            enablesFor="+">
+         </action>
+      </objectContribution>
+
+   </extension>
+
+   <!-- ============================================================ -->
+   <!--  Key Bindings                                                -->
+   <!-- ============================================================ -->
+   <extension point="org.eclipse.ui.bindings">
+
+      <key
+         commandId="com.holtek.claudecode.commands.openChatView"
+         schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+         sequence="M3+M2+C">
+      </key>
+
+   </extension>
+
+   <!-- ============================================================ -->
+   <!--  Preferences                                                 -->
+   <!-- ============================================================ -->
+   <extension point="org.eclipse.ui.preferencePages">
+      <page
+         id="com.holtek.claudecode.preferences"
+         name="Claude Code"
+         class="com.holtek.claudecode.preferences.ClaudePreferencePage">
+      </page>
+   </extension>
+
+   <extension point="org.eclipse.core.runtime.preferences">
+      <initializer
+         class="com.holtek.claudecode.preferences.ClaudePreferenceInitializer">
+      </initializer>
+   </extension>
+
+</plugin>

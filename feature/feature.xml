@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feature
+   id="com.holtek.claudecode.feature"
+   label="Claude Code for Eclipse"
+   version="1.0.0.qualifier"
+   provider-name="Holtek"
+   plugin="com.holtek.claudecode">
+
+   <description>
+      Claude Code for Eclipse — integrates Claude Code CLI into the Eclipse IDE.
+      Chat with Claude directly from your workspace, get code explanations, reviews,
+      and fixes without leaving Eclipse.
+   </description>
+
+   <copyright>
+      Copyright (c) 2026 Holtek Semiconductor Inc.
+   </copyright>
+
+   <license url="https://opensource.org/licenses/MIT">
+      MIT License
+   </license>
+
+   <url>
+      <update label="Claude Code for Eclipse Update Site" url="https://holtek.github.io/claude-code-eclipse/updatesite/"/>
+      <discovery label="Claude Code for Eclipse" url="https://holtek.github.io/claude-code-eclipse/updatesite/"/>
+   </url>
+
+   <requires>
+      <import plugin="org.eclipse.ui"/>
+      <import plugin="org.eclipse.core.runtime"/>
+      <import plugin="org.eclipse.ui.workbench"/>
+      <import plugin="org.eclipse.jface"/>
+      <import plugin="org.eclipse.core.resources"/>
+      <import plugin="org.eclipse.ui.editors"/>
+      <import plugin="org.eclipse.ui.console"/>
+   </requires>
+
+   <plugin
+      id="com.holtek.claudecode"
+      download-size="200"
+      install-size="200"
+      version="1.0.0.qualifier"
+      unpack="false"/>
+
+</feature>

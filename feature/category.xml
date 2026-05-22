@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<site>
+   <feature url="features/com.holtek.claudecode.feature_1.0.0.qualifier.jar"
+            id="com.holtek.claudecode.feature"
+            version="1.0.0.qualifier">
+      <category name="com.holtek.claudecode.category"/>
+   </feature>
+
+   <category-def name="com.holtek.claudecode.category"
+                 label="Claude Code for Eclipse">
+      <description>
+         Claude AI integration for Eclipse IDE — chat, code review, explain, and fix.
+      </description>
+   </category-def>
+</site>
