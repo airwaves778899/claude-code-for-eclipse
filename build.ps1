@@ -1,4 +1,4 @@
-# ============================================================
+﻿# ============================================================
 # build.ps1  —  Claude Code for Eclipse 完整建置腳本
 # 用法：在專案根目錄執行 .\build.ps1
 #       可選參數：-Deploy  (同時部署到 dropins)
@@ -18,7 +18,7 @@ $DROPINS = "$ECLIPSE\dropins"
 $JAVAC21 = "$ECLIPSE\plugins\org.eclipse.justj.openjdk.hotspot.jre.full.win32.x86_64_21.0.11.v20260515-1531\jre\bin\javac.exe"
 $JAVA21  = $JAVAC21.Replace("javac.exe","java.exe")
 $LAUNCHER= Get-ChildItem "$PLUGINS\org.eclipse.equinox.launcher_*" -Filter "*.jar" | Select-Object -First 1 -ExpandProperty FullName
-$JAR_NAME = "com.holtek.claudecode_1.0.0.jar"
+$JAR_NAME = "io.github.airwaves778899.claudecode_1.0.0.jar"
 $VERSION  = "1.0.0.$(Get-Date -Format 'yyyyMMdd')"
 
 Write-Host "==================================================="
@@ -111,14 +111,14 @@ if ($UpdateSite) {
     $xml = Get-Content "$ROOT\feature\feature.xml" -Raw
     $xml = $xml -replace '1\.0\.0\.qualifier', $VERSION
     Set-Content "$FEAT_TMP\feature.xml" $xml -Encoding UTF8
-    $FEAT_JAR = "$SITE\features\com.holtek.claudecode.feature_$VERSION.jar"
+    $FEAT_JAR = "$SITE\features\io.github.airwaves778899.claudecode.feature_$VERSION.jar"
     Push-Location $FEAT_TMP
     & jar cf $FEAT_JAR "feature.xml" 2>&1 | Out-Null
     Pop-Location
     Remove-Item $FEAT_TMP -Recurse -Force
 
     # Copy plugin JAR
-    $PLUGIN_DST = "$SITE\plugins\com.holtek.claudecode_$VERSION.jar"
+    $PLUGIN_DST = "$SITE\plugins\io.github.airwaves778899.claudecode_$VERSION.jar"
     Copy-Item -Force $TMPJAR $PLUGIN_DST
 
     # Run p2 publisher

@@ -1,12 +1,12 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <site>
-   <feature url="features/com.holtek.claudecode.feature_1.0.0.qualifier.jar"
-            id="com.holtek.claudecode.feature"
+   <feature url="features/io.github.airwaves778899.claudecode.feature_1.0.0.qualifier.jar"
+            id="io.github.airwaves778899.claudecode.feature"
             version="1.0.0.qualifier">
-      <category name="com.holtek.claudecode.category"/>
+      <category name="io.github.airwaves778899.claudecode.category"/>
    </feature>
 
-   <category-def name="com.holtek.claudecode.category"
+   <category-def name="io.github.airwaves778899.claudecode.category"
                  label="Claude Code for Eclipse">
       <description>
          Claude AI integration for Eclipse IDE — chat, code review, explain, and fix.

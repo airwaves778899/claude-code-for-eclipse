@@ -1,9 +1,9 @@
-Manifest-Version: 1.0
+﻿Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Claude Code for Eclipse
-Bundle-SymbolicName: com.holtek.claudecode;singleton:=true
+Bundle-SymbolicName: io.github.airwaves778899.claudecode;singleton:=true
 Bundle-Version: 1.0.0.qualifier
-Bundle-Activator: com.holtek.claudecode.Activator
+Bundle-Activator: io.github.airwaves778899.claudecode.Activator
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.ui.workbench,
@@ -14,4 +14,4 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.jdt.ui;resolution:=optional
 Bundle-RequiredExecutionEnvironment: JavaSE-17
 Bundle-ActivationPolicy: lazy
-Automatic-Module-Name: com.holtek.claudecode
+Automatic-Module-Name: io.github.airwaves778899.claudecode

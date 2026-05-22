@@ -1,4 +1,4 @@
-@echo off
+﻿@echo off
 setlocal EnableDelayedExpansion
 
 echo ============================================================
@@ -16,7 +16,7 @@ set "PLUGIN_VERSION=1.0.0"
 set "PROJECT_DIR=%~dp0"
 set "SRC_DIR=%PROJECT_DIR%src"
 set "OUT_DIR=%BUILD_DIR%\classes"
-set "JAR_OUT=%BUILD_DIR%\com.holtek.claudecode_%PLUGIN_VERSION%.jar"
+set "JAR_OUT=%BUILD_DIR%\io.github.airwaves778899.claudecode_%PLUGIN_VERSION%.jar"
 set "PLUGINS=%ECLIPSE_HOME%\plugins"
 
 echo.

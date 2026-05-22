@@ -1,4 +1,4 @@
-# Claude Code for Eclipse
+﻿# Claude Code for Eclipse
 
 An Eclipse IDE plugin that integrates [Claude Code CLI](https://docs.anthropic.com/en/docs/claude-code/overview) directly into your workspace. No API key required — uses your locally installed and authenticated `claude` CLI as the backend.
 
@@ -31,7 +31,7 @@ An Eclipse IDE plugin that integrates [Claude Code CLI](https://docs.anthropic.c
 
 ### Option 1 — Manual JAR (simplest)
 
-1. Download the latest `com.holtek.claudecode_1.0.0.jar` from [Releases](../../releases/latest)
+1. Download the latest `io.github.airwaves778899.claudecode_1.0.0.jar` from [Releases](../../releases/latest)
 2. Copy the JAR to the `dropins/` folder inside your Eclipse installation directory  
    e.g. `C:\eclipse\eclipse-jee-2024-06-R-win32-x86_64\dropins\`
 3. Restart Eclipse
