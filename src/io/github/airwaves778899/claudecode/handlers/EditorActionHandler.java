@@ -35,7 +35,7 @@ public abstract class EditorActionHandler extends AbstractHandler {
             MessageDialog.openInformation(
                 HandlerUtil.getActiveShell(event),
                 "Claude Code",
-                "請先在文字編輯器中開啟一個檔案。");
+                "Please open a file in the text editor first.");
             return null;
         }
 
@@ -52,7 +52,7 @@ public abstract class EditorActionHandler extends AbstractHandler {
                 MessageDialog.openInformation(
                     HandlerUtil.getActiveShell(event),
                     "Claude Code",
-                    "檔案內容為空。");
+                    "File is empty.");
                 return null;
             }
         }
@@ -67,7 +67,7 @@ public abstract class EditorActionHandler extends AbstractHandler {
             ClaudeView view = (ClaudeView) page.showView(ClaudeView.ID);
             view.sendWithContext(prompt, autoSend());
         } catch (PartInitException e) {
-            throw new ExecutionException("無法開啟 Claude View", e);
+            throw new ExecutionException("Cannot open Claude View", e);
         }
 
         return null;
@@ -97,6 +97,6 @@ public abstract class EditorActionHandler extends AbstractHandler {
         return MessageDialog.openQuestion(
             HandlerUtil.getActiveShell(event),
             "Claude Code",
-            "尚未選取程式碼。\n\n要將整個 " + fileName + " 的內容傳給 Claude 嗎？");
+            "No code selected.\n\nSend the entire content of " + fileName + " to Claude?");
     }
 }

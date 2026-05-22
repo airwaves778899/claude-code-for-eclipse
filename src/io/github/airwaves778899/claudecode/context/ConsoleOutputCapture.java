@@ -151,7 +151,7 @@ public final class ConsoleOutputCapture {
         for (int i = startLine; i < lines.length; i++) {
             sb.append(lines[i]).append("\n");
             if (sb.length() > MAX_CHARS) {
-                sb.append("... [截斷]");
+                sb.append("... [truncated]");
                 break;
             }
         }
@@ -177,19 +177,19 @@ public final class ConsoleOutputCapture {
         String[] lines = text.split("\n", -1);
         if (lines.length <= n) {
             return text.length() > MAX_CHARS
-                    ? "... [截斷]\n" + text.substring(text.length() - MAX_CHARS)
+                    ? "... [truncated]\n" + text.substring(text.length() - MAX_CHARS)
                     : text;
         }
         StringBuilder sb = new StringBuilder();
         if (lines.length > n) {
-            sb.append("... [前 ").append(lines.length - n).append(" 行已省略]\n");
+            sb.append("... [first ").append(lines.length - n).append(" lines omitted]\n");
         }
         for (int i = lines.length - n; i < lines.length; i++) {
             sb.append(lines[i]).append("\n");
         }
         String result = sb.toString();
         return result.length() > MAX_CHARS
-                ? "... [截斷]\n" + result.substring(result.length() - MAX_CHARS)
+                ? "... [truncated]\n" + result.substring(result.length() - MAX_CHARS)
                 : result;
     }
 }

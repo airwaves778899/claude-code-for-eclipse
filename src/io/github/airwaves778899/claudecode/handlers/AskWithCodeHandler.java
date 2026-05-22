@@ -32,15 +32,15 @@ public class AskWithCodeHandler extends AbstractHandler {
         // Open input dialog
         String dialogTitle   = "Ask Claude";
         String dialogMessage = selectedText.isBlank()
-                ? "請輸入您的問題："
-                : "請輸入針對 " + fileName + " 選取程式碼的問題：";
+                ? "Please enter your question:"
+                : "Please enter your question about selected code in " + fileName + ":";
 
         InputDialog dialog = new InputDialog(
                 HandlerUtil.getActiveShell(event),
                 dialogTitle,
                 dialogMessage,
                 "",
-                input -> (input == null || input.isBlank()) ? "問題不能為空" : null);
+                input -> (input == null || input.isBlank()) ? "Question cannot be empty" : null);
 
         if (dialog.open() != Window.OK) return null;
 
@@ -63,7 +63,7 @@ public class AskWithCodeHandler extends AbstractHandler {
             ClaudeView view = (ClaudeView) page.showView(ClaudeView.ID);
             view.sendWithContext(prompt, true);   // auto-send since user already confirmed in dialog
         } catch (PartInitException e) {
-            throw new ExecutionException("無法開啟 Claude View", e);
+            throw new ExecutionException("Cannot open Claude View", e);
         }
 
         return null;

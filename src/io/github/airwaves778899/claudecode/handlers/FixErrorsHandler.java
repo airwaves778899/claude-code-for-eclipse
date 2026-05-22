@@ -41,7 +41,7 @@ public class FixErrorsHandler extends AbstractHandler {
             MessageDialog.openInformation(
                 HandlerUtil.getActiveShell(event),
                 "Fix Compile Errors",
-                "找不到活動中的 Eclipse 專案。\n請先在編輯器中開啟一個 Java 檔案。");
+                "No active Eclipse project found.\nPlease open a Java file in the editor first.");
             return null;
         }
 
@@ -50,14 +50,14 @@ public class FixErrorsHandler extends AbstractHandler {
         try {
             errors = ProblemsHelper.getErrors(project);
         } catch (CoreException e) {
-            throw new ExecutionException("無法讀取專案錯誤清單", e);
+            throw new ExecutionException("Cannot read project error list", e);
         }
 
         if (errors.isEmpty()) {
             MessageDialog.openInformation(
                 HandlerUtil.getActiveShell(event),
                 "Fix Compile Errors",
-                "專案「" + project.getName() + "」目前沒有編譯錯誤！");
+                "Project \"" + project.getName() + "\" has no compilation errors!");
             return null;
         }
 
@@ -78,31 +78,31 @@ public class FixErrorsHandler extends AbstractHandler {
 
         // ── 4. Build prompt ───────────────────────────────────────────────────
         StringBuilder prompt = new StringBuilder();
-        prompt.append("請幫我修正以下 Eclipse 編譯錯誤。\n\n");
-        prompt.append("**專案：** ").append(project.getName()).append("\n");
-        prompt.append("**問題摘要：** ").append(ProblemsHelper.getSummary(project)).append("\n\n");
+        prompt.append("Please help me fix the following Eclipse compilation errors.\n\n");
+        prompt.append("**Project:** ").append(project.getName()).append("\n");
+        prompt.append("**Issue summary:** ").append(ProblemsHelper.getSummary(project)).append("\n\n");
 
         // Error list
-        prompt.append("**編譯錯誤清單：**\n```\n");
+        prompt.append("**Compilation error list:**\n```\n");
         int shown = Math.min(errors.size(), ProblemsHelper.MAX_PROBLEMS);
         for (int i = 0; i < shown; i++) {
             prompt.append(errors.get(i)).append("\n");
         }
         if (errors.size() > shown) {
-            prompt.append("... 以及另外 ").append(errors.size() - shown).append(" 個錯誤\n");
+            prompt.append("... and " + (errors.size() - shown) + " more error(s)\n");
         }
         prompt.append("```\n");
 
         // Editor code
         if (!editorCode.isBlank()) {
             String codeBlock = EditorContextHelper.buildCodeBlock(editorCode, ext, fileName);
-            prompt.append("\n**目前編輯器中的程式碼：**\n").append(codeBlock).append("\n");
+            prompt.append("\n**Current code in editor:**\n").append(codeBlock).append("\n");
         }
 
-        prompt.append("\n請針對每個錯誤：\n")
-              .append("1. 說明原因\n")
-              .append("2. 提供修正後的程式碼\n")
-              .append("3. 如有多個錯誤，請依序處理");
+        prompt.append("\nFor each error please:\n")
+              .append("1. Explain the cause\n")
+              .append("2. Provide the fixed code\n")
+              .append("3. If multiple errors, address them in order");
 
         // ── 5. Send to ClaudeView ─────────────────────────────────────────────
         IWorkbenchPage page =
@@ -111,7 +111,7 @@ public class FixErrorsHandler extends AbstractHandler {
             ClaudeView view = (ClaudeView) page.showView(ClaudeView.ID);
             view.sendWithContext(prompt.toString(), true);
         } catch (PartInitException e) {
-            throw new ExecutionException("無法開啟 Claude View", e);
+            throw new ExecutionException("Cannot open Claude View", e);
         }
 
         return null;

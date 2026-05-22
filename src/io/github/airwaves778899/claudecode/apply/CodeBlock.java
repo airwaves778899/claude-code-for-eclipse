@@ -26,9 +26,9 @@ public class CodeBlock {
     public String getContent()   { return content; }
     public int    getIndex()     { return index; }
 
-    /** Human-readable label, e.g. "程式碼區塊 1 (java)" */
+    /** Human-readable label, e.g. "Code Block 1 (java)" */
     public String getLabel() {
-        return "程式碼區塊 " + (index + 1) + " (" + language + ")";
+        return "Code Block " + (index + 1) + " (" + language + ")";
     }
 
     /** True if this block is likely source code (not shell output, plain text, etc.) */

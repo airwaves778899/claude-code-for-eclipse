@@ -128,15 +128,15 @@ public class ApplyCodeDialog extends Dialog {
         Label info = new Label(bar, SWT.NONE);
         info.setBackground(colorHeaderBg);
         info.setForeground(colorTextFg);
-        info.setText("語言：" + codeBlock.getLanguage() +
-                     "   ·   " + codeBlock.getContent().split("\n").length + " 行" +
-                     "   ·   右側程式碼可在套用前直接編輯");
+        info.setText("Language: " + codeBlock.getLanguage() +
+                     "   ·   " + codeBlock.getContent().split("\n").length + " lines" +
+                     "   ·   Code on the right can be edited before applying");
         info.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 
         Label hint = new Label(bar, SWT.NONE);
         hint.setBackground(colorHeaderBg);
         hint.setForeground(new Color(parent.getDisplay(), 130, 130, 130));
-        hint.setText("Ctrl+Z 可在套用後復原");
+        hint.setText("Ctrl+Z to undo after applying");
         hint.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false));
     }
 
@@ -149,12 +149,12 @@ public class ApplyCodeDialog extends Dialog {
         panels.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
         // Left panel header
-        buildPanelHeader(panels, "現有程式碼  (" + fileName + ")");
-        buildPanelHeader(panels, "Claude 建議的程式碼  (可編輯後套用)");
+        buildPanelHeader(panels, "Current code  (" + fileName + ")");
+        buildPanelHeader(panels, "Claude's suggested code  (editable before applying)");
 
         // Left panel — current code, read-only
         currentPane = buildCodePane(panels, true);
-        currentPane.setText(currentCode.isEmpty() ? "（未選取程式碼）" : currentCode);
+        currentPane.setText(currentCode.isEmpty() ? "(no code selected)" : currentCode);
 
         // Right panel — suggested code, editable
         suggestedPane = buildCodePane(panels, false);
@@ -195,9 +195,9 @@ public class ApplyCodeDialog extends Dialog {
         legend.setLayout(new GridLayout(6, false));
         legend.setLayoutData(new GridData(SWT.LEFT, SWT.BOTTOM, false, false));
 
-        buildLegendItem(legend, colorAdded,   "  新增行  ");
-        buildLegendItem(legend, colorRemoved, "  移除行  ");
-        buildLegendItem(legend, colorPaneBg,  "  未變更  ");
+        buildLegendItem(legend, colorAdded,   "  Added  ");
+        buildLegendItem(legend, colorRemoved, "  Removed  ");
+        buildLegendItem(legend, colorPaneBg,  "  Unchanged  ");
     }
 
     private void buildLegendItem(Composite parent, Color bg, String label) {
@@ -283,11 +283,11 @@ public class ApplyCodeDialog extends Dialog {
     @Override
     protected void createButtonsForButtonBar(Composite parent) {
         if (hasSelection) {
-            createButton(parent, APPLY_SELECTION, "套用到選取範圍", true);
+            createButton(parent, APPLY_SELECTION, "Apply to Selection", true);
         }
-        createButton(parent, APPLY_FILE,      "套用到整個檔案", !hasSelection);
-        createButton(parent, COPY_CLIPBOARD,  "複製到剪貼簿",   false);
-        createButton(parent, IDialogConstants.CANCEL_ID, "取消", false);
+        createButton(parent, APPLY_FILE,      "Apply to Entire File", !hasSelection);
+        createButton(parent, COPY_CLIPBOARD,  "Copy to Clipboard",   false);
+        createButton(parent, IDialogConstants.CANCEL_ID, "Cancel", false);
     }
 
     @Override
@@ -315,7 +315,7 @@ public class ApplyCodeDialog extends Dialog {
         Button btn = getButton(COPY_CLIPBOARD);
         if (btn != null) {
             String orig = btn.getText();
-            btn.setText("✓ 已複製");
+            btn.setText("✓ Copied");
             btn.setEnabled(false);
             Display.getCurrent().timerExec(1500, () -> {
                 if (!btn.isDisposed()) {

@@ -93,9 +93,26 @@ Copy-Item -Force $TMPJAR "$ROOT\$JAR_NAME"
 # ── 4. Deploy ─────────────────────────────────────────────
 if ($Deploy) {
     Write-Host ""
-    Write-Host "[4a] Deploying to Eclipse dropins..."
-    Copy-Item -Force $TMPJAR "$DROPINS\$JAR_NAME"
-    Write-Host "  Deployed → $DROPINS\$JAR_NAME"
+    Write-Host "[4a] Deploying to Eclipse plugins/..."
+    Copy-Item -Force $TMPJAR "$PLUGINS\$JAR_NAME"
+    Write-Host "  Deployed → $PLUGINS\$JAR_NAME"
+
+    # Update bundles.info so simpleconfigurator picks it up
+    $bundlesInfo = "$ECLIPSE\configuration\org.eclipse.equinox.simpleconfigurator\bundles.info"
+    if (Test-Path $bundlesInfo) {
+        $bi = Get-Content $bundlesInfo -Raw -Encoding UTF8
+        $entry = "io.github.airwaves778899.claudecode,1.0.0.qualifier,plugins/$JAR_NAME,4,false"
+        if ($bi -notmatch [regex]::Escape($entry)) {
+            # Remove any old entry for this bundle
+            $bi = $bi -replace "(?m)^io\.github\.airwaves778899\.claudecode,.*`r?`n", ""
+            $bi = $bi.TrimEnd() + "`r`n" + $entry + "`r`n"
+            $UTF8_NO_BOM = New-Object System.Text.UTF8Encoding($false)
+            [System.IO.File]::WriteAllText($bundlesInfo, $bi, $UTF8_NO_BOM)
+            Write-Host "  Updated bundles.info"
+        } else {
+            Write-Host "  bundles.info already up to date"
+        }
+    }
 }
 
 # ── 5. Update Site ────────────────────────────────────────

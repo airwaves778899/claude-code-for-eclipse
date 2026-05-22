@@ -14,7 +14,11 @@ An Eclipse IDE plugin that integrates [Claude Code CLI](https://docs.anthropic.c
 | 📁 **Auto Working Directory** | Automatically follows the active project, or set a fixed directory |
 | 📄 **Active File Context** | Automatically includes the currently open file path in every query |
 | 🖱️ **Ask Claude about selection** | Select code in any editor → right-click → send directly to Claude |
-| ⚙️ **Preferences Page** | Centralized settings for CLI path, model, and behavior toggles |
+| ⚡ **Slash Command Popup** | Type `/` for a quick-pick popup with built-in and custom commands |
+| 🛠️ **Custom Slash Commands** | Define your own `/commands` in `~/.claude/eclipse-skills.json` — reloaded on every use |
+| 🔍 **Tool-Use Display** | Claude's reasoning steps (file reads, searches, etc.) are shown in-line as they happen |
+| 🖥️ **Open CLI Terminal** | Right-click a project → Open Claude CLI Terminal for interactive Claude sessions |
+| ⚙️ **Preferences Page** | Centralized settings for CLI path, model, behavior toggles, and custom slash commands |
 | 🔑 **No API Key Needed** | Authenticates via your local Claude CLI session |
 
 ---
@@ -69,6 +73,7 @@ Go to **Window → Preferences → Claude Code**:
 | **Auto-switch working directory on tab change** | Updates working directory when you switch editor tabs |
 | **Include active file path in context** | Prepends the open file path to every message sent to Claude |
 | **Auto-allow all file operations** | Lets Claude read/write files without confirmation (⚠ test environments only) |
+| **Custom Slash Commands** | Shows path to `eclipse-skills.json` with buttons to open or create a sample file |
 
 ---
 
@@ -98,7 +103,9 @@ Use the dropdown in the top-right corner of the chat panel to switch models at a
 
 ### Slash Commands
 
-Type `/` in the input box to see available commands:
+Type `/` in the input box to open a popup with all available commands:
+
+**Built-in commands:**
 
 | Command | Description |
 |---------|-------------|
@@ -110,8 +117,33 @@ Type `/` in the input box to see available commands:
 | `/refactor` | Refactor for readability and maintainability |
 | `/optimize` | Identify performance bottlenecks |
 | `/fields` | List all fields with their types and purpose |
+| `/clear` | Clear the current conversation |
 | `/new` | Start a new conversation |
 | `/history` | Browse past conversations |
+| `/help` | Show available commands |
+
+**Custom commands (My Skills):**
+
+You can define your own slash commands in `~/.claude/eclipse-skills.json`:
+
+```json
+[
+  {
+    "command": "/summarize",
+    "description": "Summarize the current file",
+    "prompt": "Please summarize the purpose and key logic of {file}"
+  },
+  {
+    "command": "/todo",
+    "description": "List TODO items in the current file",
+    "prompt": "List all TODO and FIXME comments in {file} with brief context"
+  }
+]
+```
+
+Use `{file}` as a placeholder for the currently open file path. Custom commands appear in the `/` popup alongside built-in commands and are reloaded automatically — no restart required.
+
+To set up or open the skills file, go to **Window → Preferences → Claude Code → Custom Slash Commands**.
 
 ### @ File References
 
@@ -162,35 +194,44 @@ cd Claude_Code_for_eclipse
 
 ```
 Claude_Code_for_eclipse/
-├── src/com/holtek/claudecode/
-│   ├── Activator.java                            # OSGi Bundle Activator
+├── src/io/github/airwaves778899/claudecode/
+│   ├── Activator.java                              # OSGi Bundle Activator
 │   ├── actions/
-│   │   └── OpenChatViewAction.java               # Right-click project action
+│   │   └── OpenChatViewAction.java                 # Right-click project action
 │   ├── api/
-│   │   └── ClaudeCliClient.java                  # Claude CLI wrapper
+│   │   ├── ClaudeCliClient.java                    # Claude CLI subprocess wrapper
+│   │   ├── ChatMessage.java                        # Conversation message model
+│   │   └── StreamCallback.java                     # Streaming response callback
+│   ├── apply/
+│   │   └── CodeApplyHandler.java                   # Apply code diff to editor
+│   ├── context/
+│   │   └── WorkspaceContextBuilder.java            # Builds project/file context
+│   ├── editor/
+│   │   └── ActiveEditorTracker.java                # Tracks active editor changes
 │   ├── handlers/
-│   │   ├── OpenChatViewHandler.java              # Open chat command handler
-│   │   ├── OpenChatViewForProjectHandler.java
-│   │   └── AskClaudeAboutSelectionHandler.java   # Editor selection handler
+│   │   ├── OpenChatViewHandler.java                # Open chat command handler
+│   │   ├── OpenChatViewForProjectHandler.java      # Open chat for project handler
+│   │   ├── AskClaudeAboutSelectionHandler.java     # Editor selection → Claude
+│   │   ├── AskClaudeProjectAction.java             # Right-click project context menu
+│   │   └── OpenCliTerminalHandler.java             # Open interactive CLI terminal
 │   ├── preferences/
-│   │   ├── ClaudePreferencePage.java             # Preferences UI
-│   │   └── ClaudePreferenceInitializer.java      # Default values
+│   │   ├── ClaudePreferencePage.java               # Preferences UI
+│   │   └── ClaudePreferenceInitializer.java        # Default preference values
+│   ├── terminal/
+│   │   └── UserSkillsLoader.java                   # Load custom slash commands from JSON
 │   └── views/
-│       └── ClaudeTerminalView.java               # Main chat panel
+│       └── ClaudeTerminalView.java                 # Main chat panel view
 ├── feature/
-│   ├── feature.xml                               # Eclipse feature descriptor
-│   └── category.xml                              # p2 category
-├── updatesite/                                   # Generated p2 repository
-│   ├── content.jar
-│   ├── artifacts.jar
-│   ├── features/
-│   └── plugins/
+│   ├── feature.xml                                 # Eclipse feature descriptor
+│   └── category.xml                                # p2 update site category
+├── updatesite/                                     # Generated p2 repository (gitignored)
 ├── icons/
-│   └── claude.png
+│   ├── claude.png
+│   └── claude16.png
 ├── META-INF/
 │   └── MANIFEST.MF
 ├── plugin.xml
-├── build.ps1                                     # Build script
+├── build.ps1                                       # Build + deploy script
 └── README.md
 ```
 
@@ -198,7 +239,6 @@ Claude_Code_for_eclipse/
 
 ## Known Limitations
 
-- Claude CLI output is received as a complete batch (not streamed token-by-token); there is a brief wait for longer responses
 - Conversation history is not persisted across Eclipse restarts
 - The Update Site URL in `feature.xml` must be updated before publishing to GitHub Pages
 

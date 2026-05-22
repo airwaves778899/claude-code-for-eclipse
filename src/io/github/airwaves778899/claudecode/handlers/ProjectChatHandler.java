@@ -31,7 +31,7 @@ public class ProjectChatHandler extends AbstractHandler {
 
     /** Default question shown in the dialog as a placeholder. */
     private static final String DEFAULT_QUESTION =
-        "請分析這個專案的架構，指出潛在的問題或改善建議";
+        "Please analyze this project's architecture and identify potential issues or improvement suggestions";
 
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
@@ -42,7 +42,7 @@ public class ProjectChatHandler extends AbstractHandler {
             MessageDialog.openInformation(
                 HandlerUtil.getActiveShell(event),
                 "Project Chat",
-                "找不到活動中的 Eclipse 專案。\n請先在編輯器中開啟一個 Java 檔案。");
+                "No active Eclipse project found.\nPlease open a Java file in the editor first.");
             return null;
         }
 
@@ -52,16 +52,16 @@ public class ProjectChatHandler extends AbstractHandler {
         // Add problems info if there are errors
         String problemsInfo = "";
         if (ProblemsHelper.hasErrors(project)) {
-            problemsInfo = "\n**目前狀態：** " + ProblemsHelper.getSummary(project) + "\n";
+            problemsInfo = "\n**Current status:** " + ProblemsHelper.getSummary(project) + "\n";
         }
 
         // ── 3. Show input dialog ──────────────────────────────────────────────
         String dialogMessage =
-            "已讀取專案「" + project.getName() + "」的結構資訊。\n\n" +
-            "請輸入您想問的問題：";
+            "Loaded project \"" + project.getName() + "\" structure.\n\n" +
+            "Please enter your question:";
 
         IInputValidator validator = input ->
-            (input == null || input.isBlank()) ? "問題不能為空" : null;
+            (input == null || input.isBlank()) ? "Question cannot be empty" : null;
 
         InputDialog dialog = new InputDialog(
             HandlerUtil.getActiveShell(event),
@@ -91,7 +91,7 @@ public class ProjectChatHandler extends AbstractHandler {
             ClaudeView view = (ClaudeView) page.showView(ClaudeView.ID);
             view.sendWithContext(prompt.toString(), true);
         } catch (PartInitException e) {
-            throw new ExecutionException("無法開啟 Claude View", e);
+            throw new ExecutionException("Cannot open Claude View", e);
         }
 
         return null;

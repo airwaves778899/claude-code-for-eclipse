@@ -85,7 +85,7 @@ public final class EditorContextHelper {
         if (content == null) return "";
         if (content.length() > MAX_FILE_LENGTH) {
             return content.substring(0, MAX_FILE_LENGTH) +
-                   "\n\n// ... [檔案內容已截斷，超過 " + MAX_FILE_LENGTH + " 字元]";
+                   "\n\n// ... [file content truncated, over " + MAX_FILE_LENGTH + " characters]";
         }
         return content;
     }
@@ -142,12 +142,12 @@ public final class EditorContextHelper {
             wasTruncated = true;
         }
         StringBuilder sb = new StringBuilder();
-        sb.append("**檔案：** `").append(fileName).append("`\n");
+        sb.append("**File:** `").append(fileName).append("`\n");
         sb.append("```").append(ext).append("\n");
         sb.append(truncated);
         if (!truncated.endsWith("\n")) sb.append("\n");
         if (wasTruncated) {
-            sb.append("// ... [程式碼已截斷，超過 ").append(MAX_CODE_LENGTH).append(" 字元]\n");
+            sb.append("// ... [code truncated, over ").append(MAX_CODE_LENGTH).append(" characters]\n");
         }
         sb.append("```");
         return sb.toString();

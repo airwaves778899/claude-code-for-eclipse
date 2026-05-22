@@ -35,8 +35,8 @@ public class DebugWithClaudeHandler extends AbstractHandler {
             MessageDialog.openInformation(
                 HandlerUtil.getActiveShell(event),
                 "Debug with Claude",
-                "Eclipse Console 目前沒有輸出內容。\n\n" +
-                "請先執行您的程式，出現錯誤後再使用此功能。");
+                "Eclipse Console has no output.\n\n" +
+                "Please run your program first, then use this feature after an error occurs.");
             return null;
         }
 
@@ -55,22 +55,22 @@ public class DebugWithClaudeHandler extends AbstractHandler {
 
         // ── 3. Build prompt ───────────────────────────────────────────────────
         StringBuilder prompt = new StringBuilder();
-        prompt.append("我的程式發生了以下錯誤，請幫我診斷原因並提供修正方法。\n\n");
+        prompt.append("The following error occurred. Please diagnose the cause and provide a fix.\n\n");
 
-        prompt.append("**Console 輸出 / Stack Trace：**\n```\n")
+        prompt.append("**Console Output / Stack Trace:**\n```\n")
               .append(stackTrace)
               .append("\n```\n");
 
         if (!selectedCode.isBlank()) {
             String codeBlock = EditorContextHelper.buildCodeBlock(
                     selectedCode, ext, fileName);
-            prompt.append("\n**相關程式碼：**\n").append(codeBlock).append("\n");
+            prompt.append("\n**Related code:**\n").append(codeBlock).append("\n");
         }
 
-        prompt.append("\n請：\n")
-              .append("1. 說明這個錯誤的根本原因\n")
-              .append("2. 提供修正方法（包含程式碼）\n")
-              .append("3. 如果有預防性建議也請一併提供");
+        prompt.append("\nPlease:\n")
+              .append("1. Explain the root cause of this error\n")
+              .append("2. Provide a fix (with code)\n")
+              .append("3. Include preventive suggestions if applicable");
 
         // ── 4. Open ClaudeView and send ───────────────────────────────────────
         IWorkbenchPage page =
@@ -79,7 +79,7 @@ public class DebugWithClaudeHandler extends AbstractHandler {
             ClaudeView view = (ClaudeView) page.showView(ClaudeView.ID);
             view.sendWithContext(prompt.toString(), true);
         } catch (PartInitException e) {
-            throw new ExecutionException("無法開啟 Claude View", e);
+            throw new ExecutionException("Cannot open Claude View", e);
         }
 
         return null;

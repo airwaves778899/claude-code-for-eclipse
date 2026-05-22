@@ -9,6 +9,7 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 
 import io.github.airwaves778899.claudecode.Activator;
 import io.github.airwaves778899.claudecode.api.ClaudeCliClient;
+import io.github.airwaves778899.claudecode.terminal.UserSkillsLoader;
 
 /**
  * Window → Preferences → Claude Code
@@ -33,20 +34,20 @@ public class ClaudePreferencePage extends PreferencePage
         "claude-opus-4-7",
     };
     private static final String[] MODEL_LABELS = {
-        "claude-sonnet-4-5（建議）",
+        "claude-sonnet-4-5 (recommended)",
         "claude-opus-4-5",
         "claude-haiku-4-5",
         "claude-sonnet-4-6",
         "claude-opus-4-6",
-        "claude-opus-4-7（最新）",
+        "claude-opus-4-7 (latest)",
     };
 
     public ClaudePreferencePage() {
         super();
         setPreferenceStore(Activator.getDefault().getPreferenceStore());
         setDescription(
-            "使用 Claude Code CLI 作為後端，無需 API Key。\n" +
-            "請先在終端執行 claude 完成登入，再於此確認 CLI 路徑。"
+            "Uses Claude Code CLI as backend. No API key required.\n" +
+            "First run claude in a terminal to log in, then confirm the CLI path here."
         );
     }
 
@@ -59,15 +60,16 @@ public class ClaudePreferencePage extends PreferencePage
         root.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
         // ── CLI Path ──────────────────────────────────────────────────────
-        section(root, "Claude CLI 路徑");
+        section(root, "Claude CLI Path");
 
         Composite cliRow = row(root, 3);
-        label(cliRow, "路徑：");
+        label(cliRow, "Path:");
         cliPathText = new Text(cliRow, SWT.SINGLE | SWT.BORDER);
         cliPathText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
         cliPathText.setToolTipText(
-            "Claude Code CLI 執行檔路徑。\n留空 = 自動偵測。\n" +
-            "Windows 範例：C:\\Users\\you\\.local\\bin\\claude.exe");
+            "Path to the Claude Code CLI executable.\n" +
+            "Leave empty for auto-detection.\n" +
+            "Windows example: C:\\Users\\you\\.local\\bin\\claude.exe");
         cliPathText.setText(getPreferenceStore().getString(Activator.PREF_CLI_PATH));
 
         // Buttons row
@@ -77,65 +79,65 @@ public class ClaudePreferencePage extends PreferencePage
         btnRow.setLayout(rl);
 
         Button autoDetectBtn = new Button(btnRow, SWT.PUSH);
-        autoDetectBtn.setText("自動偵測");
-        autoDetectBtn.setToolTipText("嘗試在常見位置找到 claude 執行檔");
+        autoDetectBtn.setText("Auto-detect");
+        autoDetectBtn.setToolTipText("Try to find the claude executable in common locations");
         autoDetectBtn.addListener(SWT.Selection, e -> {
             String found = detectClaude();
             if (found != null) {
                 cliPathText.setText(found);
-                setMessage("✔ 找到：" + found, INFORMATION);
+                setMessage("✔ Found: " + found, INFORMATION);
             } else {
-                setMessage("✘ 找不到 claude 執行檔，請手動填入路徑", ERROR);
+                setMessage("✘ claude executable not found, please enter the path manually", ERROR);
             }
         });
 
         Button testBtn = new Button(btnRow, SWT.PUSH);
-        testBtn.setText("測試連線");
-        testBtn.setToolTipText("執行 claude --version 確認是否可用");
+        testBtn.setText("Test Connection");
+        testBtn.setToolTipText("Run claude --version to verify availability");
         testBtn.addListener(SWT.Selection, e -> {
             String path = cliPathText.getText().trim();
             if (path.isEmpty()) path = detectClaude();
             if (path == null) path = "claude";
             String version = ClaudeCliClient.getVersion(path);
-            boolean ok = !version.equals("未找到") && !version.startsWith("錯誤");
+            boolean ok = !version.equals("Not found") && !version.startsWith("Error");
             setMessage(
-                ok ? "✔ 連線成功　版本：" + version : "✘ 無法執行：" + version,
+                ok ? "✔ Connected  Version: " + version : "✘ Cannot run: " + version,
                 ok ? INFORMATION : ERROR);
         });
 
-        note(root, "尚未安裝？請執行：npm install -g @anthropic-ai/claude-code  然後執行 claude 登入");
+        note(root, "Not installed? Run: npm install -g @anthropic-ai/claude-code  then run claude to log in");
 
         separator(root);
 
         // ── Default working directory ─────────────────────────────────────
-        section(root, "預設工作目錄");
+        section(root, "Default Working Directory");
 
         Composite wdRow = row(root, 3);
-        label(wdRow, "目錄：");
+        label(wdRow, "Directory:");
         workDirText = new Text(wdRow, SWT.SINGLE | SWT.BORDER);
         workDirText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
-        workDirText.setToolTipText("留空 = 自動跟隨目前開啟的專案。");
+        workDirText.setToolTipText("Leave empty to follow the currently open project.");
         workDirText.setText(getPreferenceStore().getString(Activator.PREF_WORK_DIR));
 
         Button browseBtn = new Button(wdRow, SWT.PUSH);
-        browseBtn.setText("瀏覽…");
+        browseBtn.setText("Browse…");
         browseBtn.addListener(SWT.Selection, e -> {
             DirectoryDialog dlg = new DirectoryDialog(getShell(), SWT.OPEN);
-            dlg.setText("選擇預設工作目錄");
+            dlg.setText("Select Default Working Directory");
             dlg.setFilterPath(workDirText.getText());
             String chosen = dlg.open();
             if (chosen != null) workDirText.setText(chosen);
         });
 
-        note(root, "留空時依序嘗試：目前 Editor 的專案 → 第一個開啟的專案 → workspace 根");
+        note(root, "If empty, tries in order: current editor's project → first open project → workspace root");
 
         separator(root);
 
         // ── Model ─────────────────────────────────────────────────────────
-        section(root, "Claude 模型");
+        section(root, "Claude Model");
 
         Composite modelRow = row(root, 2);
-        label(modelRow, "預設模型：");
+        label(modelRow, "Default Model:");
         modelCombo = new Combo(modelRow, SWT.READ_ONLY | SWT.DROP_DOWN);
         modelCombo.setItems(MODEL_LABELS);
         modelCombo.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false));
@@ -151,24 +153,73 @@ public class ClaudePreferencePage extends PreferencePage
         separator(root);
 
         // ── Behaviour toggles ─────────────────────────────────────────────
-        section(root, "行為設定");
+        section(root, "Behavior");
 
         autoSwitchCheck = new Button(root, SWT.CHECK);
-        autoSwitchCheck.setText("切換 Tab 時自動切換工作目錄到對應專案");
+        autoSwitchCheck.setText("Auto-switch working directory when changing editor tabs");
         autoSwitchCheck.setSelection(
             getPreferenceStore().getBoolean(Activator.PREF_AUTO_SWITCH_WORKDIR));
 
         includeFileCheck = new Button(root, SWT.CHECK);
-        includeFileCheck.setText("自動將目前開啟的檔案路徑加入 context");
+        includeFileCheck.setText("Automatically include the current file path in context");
         includeFileCheck.setSelection(
             getPreferenceStore().getBoolean(Activator.PREF_INCLUDE_ACTIVE_FILE));
 
         autoPermCheck = new Button(root, SWT.CHECK);
-        autoPermCheck.setText("自動允許所有檔案操作（不詢問確認）");
+        autoPermCheck.setText("Auto-allow all file operations (skip confirmation)");
         autoPermCheck.setSelection(
             getPreferenceStore().getBoolean(Activator.PREF_AUTO_PERMISSIONS));
 
-        note(root, "⚠ 自動允許會讓 Claude 直接讀寫檔案，建議僅在測試環境啟用。");
+        note(root, "⚠ Auto-allow lets Claude read/write files directly. Enable only in test environments.");
+
+        separator(root);
+
+        // ── Custom Slash Commands ─────────────────────────────────────────
+        section(root, "Custom Slash Commands (My Skills)");
+
+        String skillsPath = UserSkillsLoader.getDefaultPath();
+
+        // Read-only path display
+        Text skillsPathText = new Text(root, SWT.SINGLE | SWT.READ_ONLY | SWT.BORDER);
+        skillsPathText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+        skillsPathText.setText(skillsPath);
+        skillsPathText.setToolTipText("Path to the custom slash-commands definition file");
+
+        // Buttons: Open / Create Sample
+        Composite skillsBtnRow = new Composite(root, SWT.NONE);
+        RowLayout sbrl = new RowLayout(SWT.HORIZONTAL);
+        sbrl.spacing = 8; sbrl.marginHeight = 0; sbrl.marginWidth = 0;
+        skillsBtnRow.setLayout(sbrl);
+
+        Button openSkillsBtn = new Button(skillsBtnRow, SWT.PUSH);
+        openSkillsBtn.setText("Open File");
+        openSkillsBtn.setToolTipText("Open the skills JSON file in the default editor");
+        openSkillsBtn.addListener(SWT.Selection, e -> {
+            java.io.File f = new java.io.File(skillsPath);
+            if (!f.exists()) UserSkillsLoader.createSampleIfAbsent();
+            boolean launched = org.eclipse.swt.program.Program.launch(
+                    new java.io.File(skillsPath).getAbsolutePath());
+            if (!launched) setMessage("Cannot open: " + skillsPath, ERROR);
+        });
+
+        Button createSampleBtn = new Button(skillsBtnRow, SWT.PUSH);
+        createSampleBtn.setText("Create Sample");
+        createSampleBtn.setToolTipText("Create a sample file with 3 example slash commands");
+        createSampleBtn.addListener(SWT.Selection, e -> {
+            java.io.File f = new java.io.File(skillsPath);
+            if (f.exists()) {
+                setMessage("File already exists: " + skillsPath, INFORMATION);
+            } else {
+                UserSkillsLoader.createSampleIfAbsent();
+                setMessage("✔ Created: " + skillsPath, INFORMATION);
+            }
+        });
+
+        note(root,
+            "Define custom /commands for the slash popup. JSON format:\n" +
+            "[ { \"command\": \"/myslash\",  \"description\": \"What it does\",\n" +
+            "    \"prompt\": \"Analyse {file} and ...\" } ]\n" +
+            "Use {file} as placeholder for the open file path. Changes take effect immediately — no restart needed.");
 
         return root;
     }

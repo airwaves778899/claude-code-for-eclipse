@@ -43,7 +43,7 @@ public class ApplyCodeHandler extends AbstractHandler {
             MessageDialog.openInformation(
                 HandlerUtil.getActiveShell(event),
                 "Apply Code",
-                "Claude Chat 面板尚未開啟，請先使用 Alt+Shift+C 開啟。");
+                "Claude Chat panel is not open. Please open it first with Alt+Shift+C.");
             return null;
         }
 
@@ -52,7 +52,7 @@ public class ApplyCodeHandler extends AbstractHandler {
             MessageDialog.openInformation(
                 HandlerUtil.getActiveShell(event),
                 "Apply Code",
-                "上一則 Claude 回應中未包含程式碼區塊。\n請先向 Claude 提問並取得包含程式碼的回應。");
+                "The last Claude response contains no code blocks.\nPlease ask Claude a question and get a response containing code first.");
             return null;
         }
 
@@ -98,7 +98,7 @@ public class ApplyCodeHandler extends AbstractHandler {
                 applyToFile(editor, code);
             }
         } catch (BadLocationException e) {
-            throw new ExecutionException("套用程式碼時發生錯誤", e);
+            throw new ExecutionException("Error applying code", e);
         }
 
         return null;
@@ -142,8 +142,8 @@ public class ApplyCodeHandler extends AbstractHandler {
 
         org.eclipse.ui.dialogs.ListDialog picker =
             new org.eclipse.ui.dialogs.ListDialog(HandlerUtil.getActiveShell(event));
-        picker.setTitle("選擇要套用的程式碼區塊");
-        picker.setMessage("此回應包含多個程式碼區塊，請選擇要套用的一個：");
+        picker.setTitle("Select Code Block to Apply");
+        picker.setMessage("This response contains multiple code blocks. Please select one to apply:");
         picker.setContentProvider(
             new org.eclipse.jface.viewers.ArrayContentProvider());
         picker.setLabelProvider(

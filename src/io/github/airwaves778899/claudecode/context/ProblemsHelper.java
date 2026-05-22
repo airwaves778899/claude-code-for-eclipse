@@ -49,13 +49,13 @@ public final class ProblemsHelper {
         try {
             int errors   = getErrors(project).size();
             int warnings = getWarnings(project).size();
-            if (errors == 0 && warnings == 0) return "無編譯問題";
+            if (errors == 0 && warnings == 0) return "No compilation issues";
             List<String> parts = new ArrayList<>();
-            if (errors   > 0) parts.add(errors   + " 個錯誤");
-            if (warnings > 0) parts.add(warnings + " 個警告");
-            return String.join("，", parts);
+            if (errors   > 0) parts.add(errors   + " error(s)");
+            if (warnings > 0) parts.add(warnings + " warning(s)");
+            return String.join(", ", parts);
         } catch (CoreException e) {
-            return "無法讀取問題列表";
+            return "Cannot read problem list";
         }
     }
 
@@ -68,15 +68,14 @@ public final class ProblemsHelper {
         if (errors.isEmpty()) return "";
 
         StringBuilder sb = new StringBuilder();
-        sb.append("**Eclipse 編譯錯誤 (").append(errors.size()).append(" 個)：**\n");
+        sb.append("**Eclipse compilation errors (").append(errors.size()).append("):**\n");
         sb.append("```\n");
         int shown = Math.min(errors.size(), MAX_PROBLEMS);
         for (int i = 0; i < shown; i++) {
             sb.append(errors.get(i)).append("\n");
         }
         if (errors.size() > MAX_PROBLEMS) {
-            sb.append("... 以及另外 ").append(errors.size() - MAX_PROBLEMS)
-              .append(" 個錯誤（已省略）\n");
+            sb.append("... and " + (errors.size() - MAX_PROBLEMS) + " more error(s) (omitted)\n");
         }
         sb.append("```\n");
         return sb.toString();

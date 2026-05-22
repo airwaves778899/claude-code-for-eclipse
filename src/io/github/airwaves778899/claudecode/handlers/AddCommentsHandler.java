@@ -8,14 +8,14 @@ public class AddCommentsHandler extends EditorActionHandler {
     @Override
     protected String buildPrompt(String fileName, String ext, String codeBlock) {
         boolean isJava = "java".equalsIgnoreCase(ext);
-        String docStyle = isJava ? "Javadoc" : "文件註解";
+        String docStyle = isJava ? "Javadoc" : "documentation comments";
 
-        return "請為以下程式碼加上完整的 " + docStyle + " 和必要的行內註解。\n" +
-               "要求：\n" +
-               "- 每個 class 和 public method 都需要 " + docStyle + "\n" +
-               "- 複雜邏輯加上行內說明\n" +
-               "- 保持原始邏輯與格式完全不變，只增加註解\n" +
-               "- 請直接輸出加上註解後的完整程式碼\n\n" +
+        return "Please add complete " + docStyle + " and necessary inline comments to the following code.\n" +
+               "Requirements:\n" +
+               "- Every class and public method needs " + docStyle + "\n" +
+               "- Add inline explanations for complex logic\n" +
+               "- Keep the original logic and formatting completely unchanged, only add comments\n" +
+               "- Output the complete code with comments added\n\n" +
                codeBlock;
     }
 }

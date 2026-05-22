@@ -8,17 +8,17 @@ public class GenerateTestsHandler extends EditorActionHandler {
     @Override
     protected String buildPrompt(String fileName, String ext, String codeBlock) {
         boolean isJava = "java".equalsIgnoreCase(ext);
-        String framework = isJava ? "JUnit 5 + Mockito" : "適合此語言的測試框架";
+        String framework = isJava ? "JUnit 5 + Mockito" : "a suitable test framework for this language";
 
-        return "請為以下程式碼使用 " + framework + " 撰寫完整的單元測試。\n" +
-               "測試要求：\n" +
-               "- 涵蓋所有 public method\n" +
-               "- 包含正常情況（happy path）\n" +
-               "- 包含邊界條件（null、空值、極大值）\n" +
-               "- 包含例外情況（應拋出例外的場景）\n" +
-               "- 使用有意義的測試方法名稱（@DisplayName）\n" +
-               "- 測試類別命名為原類別名稱加上 Test 後綴\n\n" +
-               "請先輸出測試程式碼，再簡短說明測試策略。\n\n" +
+        return "Please write complete unit tests for the following code using " + framework + ".\n" +
+               "Test requirements:\n" +
+               "- Cover all public methods\n" +
+               "- Include normal cases (happy path)\n" +
+               "- Include edge cases (null, empty, extreme values)\n" +
+               "- Include exception cases (scenarios that should throw exceptions)\n" +
+               "- Use meaningful test method names (@DisplayName)\n" +
+               "- Name test class as original class name + Test suffix\n\n" +
+               "Please output the test code first, then briefly explain the testing strategy.\n\n" +
                codeBlock;
     }
 }

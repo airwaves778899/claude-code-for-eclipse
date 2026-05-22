@@ -82,7 +82,7 @@ public class AnthropicClient {
 
         if (apiKey == null || apiKey.isBlank()) {
             throw new IllegalStateException(
-                "API Key 未設定。\n請前往 Window > Preferences > Claude Code 輸入您的 Anthropic API Key。");
+                "API Key not set.\nPlease go to Window > Preferences > Claude Code to enter your Anthropic API Key.");
         }
 
         String requestBody = buildRequestJson(messages);
@@ -232,17 +232,17 @@ public class AnthropicClient {
     private static String buildErrorMessage(int statusCode, String body) {
         String hint;
         switch (statusCode) {
-            case 401: hint = "API Key 無效或未授權。請至 Preferences > Claude Code 重新輸入。"; break;
-            case 403: hint = "存取被拒。請確認 API Key 權限。"; break;
-            case 429: hint = "請求頻率過高（Rate Limit）。請稍後再試。"; break;
+            case 401: hint = "API Key invalid or unauthorized. Please re-enter it at Preferences > Claude Code."; break;
+            case 403: hint = "Access denied. Please verify API Key permissions."; break;
+            case 429: hint = "Rate limit exceeded. Please wait and try again."; break;
             case 500:
-            case 529: hint = "Anthropic 伺服器暫時無法回應。請稍後再試。"; break;
+            case 529: hint = "Anthropic server temporarily unavailable. Please try again later."; break;
             default:  hint = "HTTP " + statusCode; break;
         }
         // Try to extract "error.message" from response body
         String detail = extractJsonField(body, "message");
         if (detail != null && !detail.isEmpty()) {
-            hint += "\n詳細：" + detail;
+            hint += "\nDetails: " + detail;
         }
         return hint;
     }

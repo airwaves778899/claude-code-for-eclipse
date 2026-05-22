@@ -24,7 +24,7 @@ public class OpenChatViewHandler extends AbstractHandler {
             MessageDialog.openError(
                 HandlerUtil.getActiveShell(event),
                 "Claude Chat",
-                "無法開啟 Claude Chat view。\n\n" + e.getMessage());
+                "Cannot open Claude Chat view.\n\n" + e.getMessage());
         }
         return null;
     }

@@ -51,8 +51,8 @@ public class OpenClaudeTerminalHandler extends AbstractHandler {
             MessageDialog.openError(
                 HandlerUtil.getActiveShell(event),
                 "Claude Code",
-                "無法開啟終端機。\n\n" + e.getMessage()
-                + "\n\n請確認 claude CLI 路徑設定（Preferences > Claude Code）。");
+                "Cannot open terminal.\n\n" + e.getMessage()
+                + "\n\nPlease check the claude CLI path at Preferences > Claude Code.");
         }
         return null;
     }

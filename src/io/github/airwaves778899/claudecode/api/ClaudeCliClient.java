@@ -107,9 +107,9 @@ public class ClaudeCliClient {
         }
     }
 
-    /** Return the CLI version string, or "未找到" if not available. */
+    /** Return the CLI version string, or "Not found" if not available. */
     public static String getVersion(String path) {
-        if (!isCliAvailable(path)) return "未找到";
+        if (!isCliAvailable(path)) return "Not found";
         try {
             List<String> cmd = buildBaseCommand(path);
             cmd.add("--version");
@@ -120,9 +120,9 @@ public class ClaudeCliClient {
                     new InputStreamReader(p.getInputStream(), StandardCharsets.UTF_8))
                     .readLine();
             p.waitFor();
-            return ver != null ? ver.trim() : "已安裝";
+            return ver != null ? ver.trim() : "Installed";
         } catch (Exception e) {
-            return "錯誤：" + e.getMessage();
+            return "Error: " + e.getMessage();
         }
     }
 
@@ -230,13 +230,13 @@ public class ClaudeCliClient {
 
         // Include history (all but the last user message)
         if (messages.size() > 1) {
-            sb.append("[對話記錄]\n");
+            sb.append("[Conversation history]\n");
             int historyCount = messages.size() - 1;
             // Truncate if too long
             List<ChatMessage> history = messages.subList(0, historyCount);
             String historyText = formatHistory(history);
             if (historyText.length() > MAX_HISTORY_CHARS) {
-                historyText = "... [較早的對話已省略]\n" +
+                historyText = "... [earlier messages omitted]\n" +
                               historyText.substring(historyText.length() - MAX_HISTORY_CHARS);
             }
             sb.append(historyText).append("\n");
@@ -244,7 +244,7 @@ public class ClaudeCliClient {
 
         // Current user message
         ChatMessage last = messages.get(messages.size() - 1);
-        if (messages.size() > 1) sb.append("[目前問題]\n");
+        if (messages.size() > 1) sb.append("[Current question]\n");
         sb.append(last.getContent());
 
         return sb.toString();
@@ -382,24 +382,24 @@ public class ClaudeCliClient {
 
     private static String buildCliError(String raw) {
         if (raw == null || raw.isBlank()) {
-            return "Claude CLI 執行失敗（無錯誤訊息）。\n" +
-                   "請確認：\n" +
-                   "  1. 已安裝 Claude Code CLI：npm install -g @anthropic-ai/claude-code\n" +
-                   "  2. 已登入：在終端執行 claude（會開啟瀏覽器）\n" +
-                   "  3. CLI 路徑設定正確：Window > Preferences > Claude Code";
+            return "Claude CLI execution failed (no error message).\n" +
+                   "Please verify:\n" +
+                   "  1. Claude Code CLI is installed: npm install -g @anthropic-ai/claude-code\n" +
+                   "  2. You are logged in: run claude in a terminal (browser will open)\n" +
+                   "  3. CLI path is correctly set: Window > Preferences > Claude Code";
         }
         if (raw.contains("not logged in") || raw.contains("unauthenticated") ||
             raw.contains("Please login") || raw.contains("401")) {
-            return "尚未登入 Claude Code CLI。\n" +
-                   "請在終端執行：claude\n" +
-                   "瀏覽器將開啟，用 Claude Team 帳號登入後即可使用。";
+            return "Not logged in to Claude Code CLI.\n" +
+                   "Run in a terminal: claude\n" +
+                   "A browser will open — log in with your Claude Team account.";
         }
         if (raw.contains("command not found") || raw.contains("不是內部或外部命令") ||
             raw.contains("cannot find") || raw.contains("No such file")) {
-            return "找不到 Claude Code CLI。\n" +
-                   "請安裝：npm install -g @anthropic-ai/claude-code\n" +
-                   "或在 Window > Preferences > Claude Code 設定正確的 CLI 路徑。";
+            return "Claude Code CLI not found.\n" +
+                   "Install: npm install -g @anthropic-ai/claude-code\n" +
+                   "Or set the correct path at Window > Preferences > Claude Code.";
         }
-        return "Claude CLI 錯誤：\n" + raw;
+        return "Claude CLI error:\n" + raw;
     }
 }

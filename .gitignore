@@ -6,6 +6,9 @@ bin/
 build/
 *.jar
 
+# Temporary build helper files
+compile_args.txt
+
 # Generated p2 Update Site (regenerate with: .\build.ps1 -UpdateSite)
 updatesite/
 

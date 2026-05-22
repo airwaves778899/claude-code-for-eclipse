@@ -7,14 +7,14 @@ public class FixCodeHandler extends EditorActionHandler {
 
     @Override
     protected String buildPrompt(String fileName, String ext, String codeBlock) {
-        return "請審查以下程式碼，找出潛在問題並提供修正後的版本。\n" +
-               "請檢查：\n" +
-               "- Bug 與邏輯錯誤\n" +
-               "- 效能問題\n" +
-               "- 例外處理是否完整\n" +
-               "- 程式碼可讀性與命名\n" +
-               "- 安全性疑慮（若有）\n\n" +
-               "請先說明發現的問題，再提供修正後的完整程式碼。\n\n" +
+        return "Please review the following code, identify potential issues and provide a fixed version.\n" +
+               "Please check:\n" +
+               "- Bugs and logic errors\n" +
+               "- Performance issues\n" +
+               "- Exception handling completeness\n" +
+               "- Code readability and naming\n" +
+               "- Security concerns (if any)\n\n" +
+               "Please explain the issues found first, then provide the complete fixed code.\n\n" +
                codeBlock;
     }
 }

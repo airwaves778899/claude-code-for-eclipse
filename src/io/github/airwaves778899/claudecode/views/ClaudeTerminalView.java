@@ -53,27 +53,41 @@ public class ClaudeTerminalView extends ViewPart {
 
     public static final String ID = "io.github.airwaves778899.claudecode.views.ClaudeTerminalView";
 
-    // ── Slash-command skill definitions ───────────────────────────────────────
+    // ── Slash-command skill definitions (prompt templates) ───────────────────
     private static final String[][] SKILLS = {
-        { "/explain",  "解釋這個 class 的作用與設計",
-          "[Context: open file: %s]\n\n請詳細解釋這個 Java class 的功能：主要職責、類別設計、重要方法與邏輯流程。使用繁體中文。" },
-        { "/fix",      "找出並修正錯誤",
-          "[Context: open file: %s]\n\n請分析這個 Java class，找出所有錯誤、Bug、潛在問題並修正。說明每個問題的原因。" },
-        { "/doc",      "為所有 public 方法加上 Javadoc",
-          "[Context: open file: %s]\n\n請為這個 Java class 的所有 public 方法加上完整的 Javadoc（@param, @return, @throws），輸出整個修改後的檔案。" },
-        { "/test",     "產生 JUnit 5 測試",
-          "[Context: open file: %s]\n\n請為這個 Java class 產生完整的 JUnit 5 單元測試，涵蓋正常情況與邊界條件。" },
-        { "/review",   "Code Review — 找出潛在問題",
-          "[Context: open file: %s]\n\n請進行 Code Review，重點檢查：設計模式、效能問題、安全性、可讀性、重複程式碼，給出具體改善建議。" },
-        { "/refactor", "重構以提升可讀性",
-          "[Context: open file: %s]\n\n請重構這個 Java class：改善命名、拆分過長方法、消除重複碼，並說明每項改動原因，輸出完整修改後的檔案。" },
-        { "/optimize", "效能優化建議",
-          "[Context: open file: %s]\n\n請分析這個 Java class 的效能瓶頸，提供具體優化建議與改寫範例。" },
-        { "/fields",   "列出所有欄位與其用途",
-          "[Context: open file: %s]\n\n請列出這個 Java class 的所有欄位（fields），說明每個欄位的資料型別、用途與初始值。" },
-        { "/new",      "開始新對話",      "__new__" },
-        { "/history",  "查看歷史對話",    "__history__" },
-        { "/help",     "顯示所有可用指令","__help__" },
+        { "/explain",  "Explain this class's design and purpose",
+          "[Context: open file: %s]\n\nPlease explain this Java class in detail: its main responsibilities, class design, key methods and logic flow." },
+        { "/fix",      "Find and fix bugs",
+          "[Context: open file: %s]\n\nPlease analyze this Java class, find all bugs and potential issues, fix them, and explain the cause of each problem." },
+        { "/doc",      "Add Javadoc to all public methods",
+          "[Context: open file: %s]\n\nPlease add complete Javadoc (@param, @return, @throws) to all public methods in this Java class and output the entire updated file." },
+        { "/test",     "Generate JUnit 5 tests",
+          "[Context: open file: %s]\n\nPlease generate complete JUnit 5 unit tests for this Java class, covering normal cases and edge cases." },
+        { "/codereview","Code review — find potential issues",
+          "[Context: open file: %s]\n\nPlease do a code review focusing on: design patterns, performance issues, security, readability, duplicate code. Provide specific improvement suggestions." },
+        { "/refactor", "Refactor to improve readability",
+          "[Context: open file: %s]\n\nPlease refactor this Java class: improve naming, split long methods, eliminate duplicate code. Explain each change and output the complete updated file." },
+        { "/optimize", "Performance optimization suggestions",
+          "[Context: open file: %s]\n\nPlease analyze the performance bottlenecks in this Java class and provide specific optimization suggestions with examples." },
+        { "/fields",   "List all fields and their purpose",
+          "[Context: open file: %s]\n\nPlease list all fields in this Java class, describing each field's type, purpose and initial value." },
+        { "/new",      "Start new conversation",      "__new__" },
+        { "/history",  "View conversation history",    "__history__" },
+        { "/help",     "Show all available commands","__help__" },
+    };
+
+    // ── Claude CLI native commands (passed through directly to CLI) ───────────
+    private static final String[][] CLI_COMMANDS = {
+        { "/clear",         "Clear conversation history",              "__cli__" },
+        { "/compact",       "Compact conversation (keeps summary)",    "__cli__" },
+        { "/cost",          "Show token usage and cost for session",   "__cli__" },
+        { "/doctor",        "Check Claude Code installation health",   "__cli__" },
+        { "/memory",        "Edit CLAUDE.md memory files",            "__cli__" },
+        { "/review",        "Review current git diff changes",         "__cli__" },
+        { "/status",        "Show account and system status",          "__cli__" },
+        { "/pr-comments",   "View pull request review comments",       "__cli__" },
+        { "/release-notes", "View release notes",                      "__cli__" },
+        { "/vim",           "Toggle vim mode",                         "__cli__" },
     };
 
     // ── Widgets ────────────────────────────────────────────────────────────────
@@ -153,6 +167,8 @@ public class ClaudeTerminalView extends ViewPart {
     public void createPartControl(Composite parent) {
         initResources(parent.getDisplay());
         currentWorkDir = ClaudeTerminalContext.getWorkDir();
+        // Create sample skills file on first run so users know the format
+        UserSkillsLoader.createSampleIfAbsent();
 
         // ── Load initial preference values ──────────────────────────────────────
         IPreferenceStore store = Activator.getDefault().getPreferenceStore();
@@ -295,7 +311,7 @@ public class ClaudeTerminalView extends ViewPart {
         workDirLbl.setForeground(colMeta);
         workDirLbl.setBackground(colHeaderBg);
         workDirLbl.setFont(monoFont);
-        workDirLbl.setToolTipText("點擊更改工作目錄");
+        workDirLbl.setToolTipText("Click to change working directory");
         updateWorkDirLabel();
         workDirLbl.setCursor(workDirLbl.getDisplay().getSystemCursor(SWT.CURSOR_HAND));
         workDirLbl.addMouseListener(new MouseAdapter() {
@@ -317,7 +333,7 @@ public class ClaudeTerminalView extends ViewPart {
             "sonnet-4-6", "opus-4-6", "opus-4-7"
         });
         modelCombo.setText("sonnet-4-5");
-        modelCombo.setToolTipText("選擇 Claude 模型");
+        modelCombo.setToolTipText("Select Claude model");
         modelCombo.addSelectionListener(new SelectionAdapter() {
             @Override public void widgetSelected(SelectionEvent e) {
                 selectedModel = modelCombo.getText();
@@ -326,14 +342,14 @@ public class ClaudeTerminalView extends ViewPart {
 
         Button histBtn = new Button(btns, SWT.PUSH);
         histBtn.setText("⏱");
-        histBtn.setToolTipText("歷史對話");
+        histBtn.setToolTipText("Conversation history");
         histBtn.addSelectionListener(new SelectionAdapter() {
             @Override public void widgetSelected(SelectionEvent e) { showHistory(histBtn); }
         });
 
         permToggle = new Button(btns, SWT.TOGGLE);
         permToggle.setText("🔒");
-        permToggle.setToolTipText("🔒 Ask — 寫入前詢問確認\n⚡ Auto — 全自動（跳過所有確認）");
+        permToggle.setToolTipText("🔒 Ask — confirm before writing files\n⚡ Auto — allow all file operations automatically");
         permToggle.addSelectionListener(new SelectionAdapter() {
             @Override public void widgetSelected(SelectionEvent e) {
                 autoPermissions = permToggle.getSelection();
@@ -343,7 +359,7 @@ public class ClaudeTerminalView extends ViewPart {
 
         newBtn = new Button(btns, SWT.PUSH);
         newBtn.setText("⊕");
-        newBtn.setToolTipText("開始新對話");
+        newBtn.setToolTipText("New conversation");
         newBtn.addSelectionListener(new SelectionAdapter() {
             @Override public void widgetSelected(SelectionEvent e) { newConversation(); }
         });
@@ -351,7 +367,7 @@ public class ClaudeTerminalView extends ViewPart {
         // Header-level stop button — always visible even if bottom row is covered
         headerStopBtn = new Button(btns, SWT.PUSH);
         headerStopBtn.setText("■");
-        headerStopBtn.setToolTipText("停止目前的回應 (Stop)");
+        headerStopBtn.setToolTipText("Stop current response");
         headerStopBtn.setEnabled(false);
         headerStopBtn.addSelectionListener(new SelectionAdapter() {
             @Override public void widgetSelected(SelectionEvent e) { stopQuery(); }
@@ -367,12 +383,12 @@ public class ClaudeTerminalView extends ViewPart {
             ? "📁 " + parts[parts.length - 2] + "/" + parts[parts.length - 1]
             : "📁 " + dir;
         workDirLbl.setText(display);
-        workDirLbl.setToolTipText(dir + "\n(點擊更改)");
+        workDirLbl.setToolTipText(dir + "\n(click to change)");
     }
 
     private void changeWorkDir() {
         DirectoryDialog dlg = new DirectoryDialog(output.getShell(), SWT.OPEN);
-        dlg.setText("選擇 Claude Terminal 工作目錄");
+        dlg.setText("Select Claude Terminal Working Directory");
         dlg.setFilterPath(currentWorkDir);
         String chosen = dlg.open();
         if (chosen != null) {
@@ -479,8 +495,8 @@ public class ClaudeTerminalView extends ViewPart {
 
         // New session button
         Button newSessionBtn = new Button(center, SWT.PUSH);
-        newSessionBtn.setText("  ▶   新對話  ");
-        newSessionBtn.setToolTipText("開始全新的 Claude 對話");
+        newSessionBtn.setText("  ▶   New Chat  ");
+        newSessionBtn.setToolTipText("Start a new Claude conversation");
         GridData ngd = new GridData(SWT.CENTER, SWT.CENTER, true, false);
         ngd.minimumWidth = 220; ngd.heightHint = 36;
         newSessionBtn.setLayoutData(ngd);
@@ -493,8 +509,8 @@ public class ClaudeTerminalView extends ViewPart {
 
         // Continue last session button
         Button contBtn = new Button(center, SWT.PUSH);
-        contBtn.setText("  ⏭   繼續上次對話  ");
-        contBtn.setToolTipText("繼續上一個 Claude CLI 對話");
+        contBtn.setText("  ⏭   Continue Last  ");
+        contBtn.setToolTipText("Continue the previous Claude CLI conversation");
         GridData cgd = new GridData(SWT.CENTER, SWT.CENTER, true, false);
         cgd.minimumWidth = 220; cgd.heightHint = 36;
         contBtn.setLayoutData(cgd);
@@ -507,8 +523,8 @@ public class ClaudeTerminalView extends ViewPart {
 
         // View history button
         Button histLaunchBtn = new Button(center, SWT.PUSH);
-        histLaunchBtn.setText("  📚   選擇歷史對話  ");
-        histLaunchBtn.setToolTipText("從歷史記錄中選擇並恢復對話");
+        histLaunchBtn.setText("  📚   History  ");
+        histLaunchBtn.setToolTipText("Browse and restore a past conversation");
         GridData hgd = new GridData(SWT.CENTER, SWT.CENTER, true, false);
         hgd.minimumWidth = 220; hgd.heightHint = 36;
         histLaunchBtn.setLayoutData(hgd);
@@ -579,7 +595,7 @@ public class ClaudeTerminalView extends ViewPart {
 
         copyCodeBtn = new Button(actionBar, SWT.PUSH);
         copyCodeBtn.setText("📋 Copy");
-        copyCodeBtn.setToolTipText("複製最後一個程式碼區塊到剪貼簿");
+        copyCodeBtn.setToolTipText("Copy last code block to clipboard");
         copyCodeBtn.setEnabled(false);
         copyCodeBtn.addSelectionListener(new SelectionAdapter() {
             @Override public void widgetSelected(SelectionEvent e) { copyLastCodeBlock(); }
@@ -587,7 +603,7 @@ public class ClaudeTerminalView extends ViewPart {
 
         applyFileBtn = new Button(actionBar, SWT.PUSH);
         applyFileBtn.setText("✏️ Apply to File");
-        applyFileBtn.setToolTipText("將程式碼套用到目前開啟的檔案（顯示 Diff 確認）");
+        applyFileBtn.setToolTipText("Apply code to currently open file (shows diff for confirmation)");
         applyFileBtn.setEnabled(false);
         applyFileBtn.addSelectionListener(new SelectionAdapter() {
             @Override public void widgetSelected(SelectionEvent e) { applyCodeToFile(); }
@@ -595,7 +611,7 @@ public class ClaudeTerminalView extends ViewPart {
 
         viewDiffBtn = new Button(actionBar, SWT.PUSH);
         viewDiffBtn.setText("🔍 View Diff");
-        viewDiffBtn.setToolTipText("預覽修改前後的差異");
+        viewDiffBtn.setToolTipText("Preview diff before/after changes");
         viewDiffBtn.setEnabled(false);
         viewDiffBtn.addSelectionListener(new SelectionAdapter() {
             @Override public void widgetSelected(SelectionEvent e) { viewDiff(); }
@@ -647,7 +663,7 @@ public class ClaudeTerminalView extends ViewPart {
 
         Button refresh = new Button(contextBar, SWT.PUSH | SWT.FLAT);
         refresh.setText("↻");
-        refresh.setToolTipText("重新抓取目前開啟的檔案");
+        refresh.setToolTipText("Refresh currently open file");
         refresh.setBackground(colContextBg);
         refresh.addSelectionListener(new SelectionAdapter() {
             @Override public void widgetSelected(SelectionEvent e) { fetchActiveFile(); }
@@ -662,7 +678,7 @@ public class ClaudeTerminalView extends ViewPart {
         // Thinking spinner — 放在 parent（非 inputPanel 內），避免顯示時把輸入框推出畫面
         // output StyledText 有 grabExcessVerticalSpace=true，會自動吸收高度變化
         thinkingLbl = new Label(parent, SWT.NONE);
-        thinkingLbl.setText("  ⠋ 思考中…");
+        thinkingLbl.setText("  ⠋ Thinking…");
         thinkingLbl.setForeground(colClaude);
         thinkingLbl.setBackground(colBg);
         GridData tgd = new GridData(SWT.FILL, SWT.CENTER, true, false);
@@ -683,7 +699,7 @@ public class ClaudeTerminalView extends ViewPart {
 
         // Status banner ("Claude 已結束") — hidden until process exits
         statusBannerLbl = new Label(inputPanel, SWT.NONE);
-        statusBannerLbl.setText("  ●  Claude 已結束 — 輸入訊息重新開始，或點擊 ⊕ 新對話");
+        statusBannerLbl.setText("  ●  Claude session ended — type a message to restart, or click ⊕ for new conversation");
         statusBannerLbl.setForeground(colToolWrite);
         statusBannerLbl.setBackground(colBg);
         GridData sbgd = new GridData(SWT.FILL, SWT.CENTER, true, false);
@@ -703,15 +719,14 @@ public class ClaudeTerminalView extends ViewPart {
         inputArea.setLineSpacing(1);
         excl(inputArea);
 
-        // Placeholder text
-        setPlaceholder();
-        inputArea.addFocusListener(new FocusAdapter() {
-            @Override public void focusGained(FocusEvent e) {
-                if (inputArea.getText().equals(PLACEHOLDER)) {
-                    inputArea.setText(""); inputArea.setForeground(colText);
-                }
+        // Placeholder drawn via PaintListener — inputArea always contains only real user text
+        inputArea.addPaintListener(e -> {
+            if (inputArea.getText().isEmpty()) {
+                e.gc.setForeground(colTime);
+                e.gc.setFont(monoFont);
+                e.gc.drawText(PLACEHOLDER, inputArea.getLeftMargin(),
+                              inputArea.getTopMargin() + 1, true);
             }
-            @Override public void focusLost(FocusEvent e) { setPlaceholder(); }
         });
 
         inputArea.addModifyListener(e -> {
@@ -757,7 +772,7 @@ public class ClaudeTerminalView extends ViewPart {
 
         stopBtn = new Button(btmRow, SWT.PUSH);
         stopBtn.setText("■ Stop");
-        stopBtn.setToolTipText("停止目前的回應");
+        stopBtn.setToolTipText("Stop current response");
         stopBtn.setEnabled(false);
         stopBtn.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false));
         stopBtn.addSelectionListener(new SelectionAdapter() {
@@ -773,16 +788,8 @@ public class ClaudeTerminalView extends ViewPart {
     }
 
     private static final String PLACEHOLDER = "Ask Claude...  (/ for commands,  @ for files)";
-    private void setPlaceholder() {
-        if (inputArea.isDisposed()) return;
-        if (inputArea.getText().isEmpty()) {
-            inputArea.setText(PLACEHOLDER);
-            inputArea.setForeground(colTime);
-        }
-    }
     private String getInput() {
-        String t = inputArea.getText().trim();
-        return t.equals(PLACEHOLDER) ? "" : t;
+        return inputArea.getText().trim();
     }
 
     private void autoGrow() {
@@ -802,9 +809,11 @@ public class ClaudeTerminalView extends ViewPart {
     // Completion popup (/ commands and @ files)
     // ══════════════════════════════════════════════════════════════════════════
 
+    private static final String COMPLETION_HEADER = "__header__";
+
     private void showCompletionPopup(String filter, boolean isAtMention) {
         List<String[]> matches = isAtMention
-            ? findWorkspaceFiles(filter.substring(1))  // strip @
+            ? findWorkspaceFiles(filter.substring(1))
             : findSkillMatches(filter);
 
         if (matches.isEmpty()) { hideCompletionPopup(); return; }
@@ -819,27 +828,80 @@ public class ClaudeTerminalView extends ViewPart {
             new TableColumn(completionTable, SWT.NONE);
             new TableColumn(completionTable, SWT.NONE);
             completionTable.addMouseListener(new MouseAdapter() {
-                @Override public void mouseDoubleClick(MouseEvent e) { applyCompletion(); }
+                @Override public void mouseUp(MouseEvent e) {
+                    int idx = completionTable.getSelectionIndex();
+                    if (idx >= 0 && completionTable.getItem(idx).getData() instanceof String[])
+                        applyCompletion();
+                }
             });
         }
 
         completionTable.removeAll();
-        for (String[] item : matches) {
-            TableItem ti = new TableItem(completionTable, SWT.NONE);
-            ti.setText(0, item[0]);
-            ti.setText(1, "  " + item[1]);
-            ti.setData(item);
+
+        if (!isAtMention) {
+            // Split into three groups
+            List<String[]> cliItems    = new ArrayList<>();
+            List<String[]> promptItems = new ArrayList<>();
+            List<String[]> userItems   = new ArrayList<>();
+
+            // Collect user skill commands to identify them
+            List<String> userCommands = new ArrayList<>();
+            for (String[] u : UserSkillsLoader.load()) userCommands.add(u[0]);
+
+            for (String[] m : matches) {
+                if ("__cli__".equals(m[2]))         cliItems.add(m);
+                else if (userCommands.contains(m[0])) userItems.add(m);
+                else                                promptItems.add(m);
+            }
+
+            // Helper: add a section (header + items)
+            addSection(completionTable, " Claude CLI",        cliItems,    colClaude);
+            addSection(completionTable, " Prompt Templates",  promptItems, null);
+            addSection(completionTable, " My Skills",         userItems,   colYou);
+        } else {
+            for (String[] item : matches) {
+                TableItem ti = new TableItem(completionTable, SWT.NONE);
+                ti.setText(0, item[0]);
+                ti.setText(1, "   " + item[1]);
+                ti.setData(item);
+            }
         }
-        if (completionTable.getItemCount() > 0) completionTable.setSelection(0);
+
+        // Select first non-header row
+        for (int i = 0; i < completionTable.getItemCount(); i++) {
+            if (completionTable.getItem(i).getData() instanceof String[]) {
+                completionTable.setSelection(i); break;
+            }
+        }
         completionTable.getColumn(0).pack();
         completionTable.getColumn(1).pack();
 
         Point loc = inputArea.toDisplay(0, 0);
-        int h = Math.min(matches.size(), 9) * 22 + 6;
-        int w = Math.max(420, inputArea.getSize().x);
+        // Count non-header rows for height (headers count as 0.6 rows visually)
+        int rowH = 22;
+        int totalRows = completionTable.getItemCount();
+        int visRows  = Math.min(totalRows, 12);
+        int h = visRows * rowH + 6;
+        int w = Math.max(500, inputArea.getSize().x);
         completionPopup.setBounds(loc.x, loc.y - h, w, h);
         completionPopup.setVisible(true);
         completionPopup.moveAbove(null);
+    }
+
+    /** Append a labelled section of items to the completion table. */
+    private void addSection(Table table, String header, List<String[]> items, Color itemColor) {
+        if (items.isEmpty()) return;
+        TableItem hdr = new TableItem(table, SWT.NONE);
+        hdr.setText(0, header);
+        hdr.setForeground(colMeta);
+        hdr.setData(COMPLETION_HEADER);
+        for (String[] item : items) {
+            TableItem ti = new TableItem(table, SWT.NONE);
+            ti.setText(0, "  " + item[0]);
+            ti.setText(1, "   " + item[1]);
+            if (itemColor != null) ti.setForeground(itemColor);
+            ti.setData(item);
+        }
     }
 
     private void hideCompletionPopup() {
@@ -848,8 +910,20 @@ public class ClaudeTerminalView extends ViewPart {
     }
 
     private void moveCompletion(int delta) {
-        int sel = completionTable.getSelectionIndex() + delta;
-        sel = Math.max(0, Math.min(completionTable.getItemCount() - 1, sel));
+        int total = completionTable.getItemCount();
+        int sel   = completionTable.getSelectionIndex() + delta;
+        // Skip over header rows
+        while (sel >= 0 && sel < total
+                && !(completionTable.getItem(sel).getData() instanceof String[])) {
+            sel += delta;
+        }
+        sel = Math.max(0, Math.min(total - 1, sel));
+        // If we've bounced to a header, scan back to nearest selectable
+        if (!(completionTable.getItem(sel).getData() instanceof String[])) {
+            for (int i = sel; i >= 0; i--) {
+                if (completionTable.getItem(i).getData() instanceof String[]) { sel = i; break; }
+            }
+        }
         completionTable.setSelection(sel);
     }
 
@@ -857,7 +931,9 @@ public class ClaudeTerminalView extends ViewPart {
         if (completionTable == null || completionTable.isDisposed()) return;
         int idx = completionTable.getSelectionIndex();
         if (idx < 0) return;
-        String[] item = (String[]) completionTable.getItem(idx).getData();
+        Object data = completionTable.getItem(idx).getData();
+        if (!(data instanceof String[])) return;  // header row — ignore
+        String[] item = (String[]) data;
         hideCompletionPopup();
 
         boolean isSkill = item[0].startsWith("/");
@@ -866,6 +942,16 @@ public class ClaudeTerminalView extends ViewPart {
             if ("__new__".equals(template))     { inputArea.setText(""); newConversation(); return; }
             if ("__history__".equals(template)) { inputArea.setText(""); showHistory(null); return; }
             if ("__help__".equals(template))    { inputArea.setText(""); showHelp(); return; }
+            // CLI native command — put the command text in the input box, ready to send as-is.
+            // Use asyncExec to hide the popup AFTER the ModifyListener re-shows it (setText triggers it).
+            if ("__cli__".equals(template)) {
+                inputArea.setText(item[0]);
+                inputArea.setForeground(colText);
+                inputArea.setCaretOffset(item[0].length());
+                autoGrow();
+                inputArea.getDisplay().asyncExec(this::hideCompletionPopup);
+                return;
+            }
             String fp = activeFilePath != null ? activeFilePath : "(no file open)";
             String expanded = String.format(template, fp);
             inputArea.setText(expanded);
@@ -886,7 +972,12 @@ public class ClaudeTerminalView extends ViewPart {
     private List<String[]> findSkillMatches(String filter) {
         String f = filter.toLowerCase();
         List<String[]> r = new ArrayList<>();
-        for (String[] s : SKILLS) { if (s[0].startsWith(f)) r.add(s); }
+        // CLI native commands first
+        for (String[] s : CLI_COMMANDS) { if (s[0].startsWith(f)) r.add(s); }
+        // Built-in prompt templates
+        for (String[] s : SKILLS)       { if (s[0].startsWith(f)) r.add(s); }
+        // User-defined skills (loaded fresh from ~/.claude/eclipse-skills.json each time)
+        for (String[] s : UserSkillsLoader.load()) { if (s[0].startsWith(f)) r.add(s); }
         return r;
     }
 
@@ -952,7 +1043,7 @@ public class ClaudeTerminalView extends ViewPart {
                         currentWorkDir = projRoot;
                         updateWorkDirLabel();
                         // 在 output 裡顯示一行提示，讓使用者知道 workdir 切換了
-                        appendMeta("  📁 已切換專案：" + proj.getName()
+                        appendMeta("  📁 Switched project: " + proj.getName()
                                    + "  →  " + projRoot + "\n");
                     }
                 }
@@ -985,11 +1076,29 @@ public class ClaudeTerminalView extends ViewPart {
 
     private void showHelp() {
         appendMeta("\n━━━━━━━━━  Available Commands  ━━━━━━━━━\n\n");
-        for (String[] s : SKILLS) {
-            if (!s[2].startsWith("__")) appendMeta(String.format("  %-12s  %s\n", s[0], s[1]));
-            else appendMeta(String.format("  %-12s  %s\n", s[0], s[1]));
+        appendMeta("  Claude CLI  (passed directly to CLI)\n");
+        appendMeta("  ─────────────────────────────────────\n");
+        for (String[] s : CLI_COMMANDS) {
+            appendMeta(String.format("  %-18s  %s\n", s[0], s[1]));
         }
-        appendMeta("\n  @ filename   引用 workspace 中的檔案作為 context\n\n");
+        appendMeta("\n  Prompt Templates  (expand to prompt for the open file)\n");
+        appendMeta("  ──────────────────────────────────────────────────────\n");
+        for (String[] s : SKILLS) {
+            appendMeta(String.format("  %-18s  %s\n", s[0], s[1]));
+        }
+
+        List<String[]> userSkills = UserSkillsLoader.load();
+        appendMeta("\n  My Skills  (from " + UserSkillsLoader.getDefaultPath() + ")\n");
+        appendMeta("  ──────────────────────────────────────────────────────\n");
+        if (userSkills.isEmpty()) {
+            appendMeta("  (none yet — create the JSON file above to add your own commands)\n");
+            appendMeta("  Format:  { \"command\": \"/name\", \"description\": \"...\", \"prompt\": \"... {file} ...\" }\n");
+        } else {
+            for (String[] s : userSkills) {
+                appendMeta(String.format("  %-18s  %s\n", s[0], s[1]));
+            }
+        }
+        appendMeta("\n  @ filename   reference a workspace file as context\n\n");
     }
 
     private void showHistory(Button anchor) {
@@ -1018,7 +1127,7 @@ public class ClaudeTerminalView extends ViewPart {
         clear.setText("Clear History");
         clear.addSelectionListener(new SelectionAdapter() {
             @Override public void widgetSelected(SelectionEvent e) {
-                if (MessageDialog.openConfirm(output.getShell(), "Clear History", "刪除所有歷史對話記錄？"))
+                if (MessageDialog.openConfirm(output.getShell(), "Clear History", "Delete all conversation history?"))
                     SessionHistory.clearAll();
             }
         });
@@ -1060,10 +1169,37 @@ public class ClaudeTerminalView extends ViewPart {
         inputArea.setForeground(colText);
         autoGrow();
 
+        // ── Handle CLI commands locally (they don't work in -p mode) ─────────
+        String trimmed = msg.trim();
+        switch (trimmed) {
+            case "/clear":
+                newConversation();
+                appendMeta("  🗑 Conversation cleared  (same as /new)\n");
+                return;
+            case "/new":
+                newConversation();
+                return;
+            case "/help":
+                showHelp();
+                return;
+            case "/history":
+                showHistory(null);
+                return;
+        }
+        // Other CLI commands need the interactive terminal
+        for (String[] cli : CLI_COMMANDS) {
+            if (cli[0].equals(trimmed)) {
+                appendMeta("  ℹ " + cli[0] + " requires Claude CLI interactive mode.\n" +
+                           "  Right-click your project → Open Claude CLI Terminal\n");
+                return;
+            }
+        }
+        // ─────────────────────────────────────────────────────────────────────
+
         if (busy) {
             // Queue — will auto-send when Claude finishes
             messageQueue.addLast(msg);
-            appendMeta("  ⏳ 已排隊 [" + messageQueue.size() + "]：" +
+            appendMeta("  ⏳ Queued [" + messageQueue.size() + "]: " +
                        (msg.length() > 40 ? msg.substring(0, 40) + "…" : msg) + "\n");
             output.setTopIndex(output.getLineCount() - 1);
             return;
@@ -1096,8 +1232,8 @@ public class ClaudeTerminalView extends ViewPart {
             boolean[] proceed = {true};
             output.getDisplay().syncExec(() -> {
                 proceed[0] = MessageDialog.openQuestion(output.getShell(), "Claude Permission",
-                    "此操作可能會修改檔案。\n目前開啟：" + (activeFilePath != null ? activeFilePath : "(none)") +
-                    "\n\n允許 Claude 讀寫檔案？");
+                    "This operation may modify files.\nCurrently open: " + (activeFilePath != null ? activeFilePath : "(none)") +
+                    "\n\nAllow Claude to read/write files?");
             });
             if (!proceed[0]) {
                 busy = false;
@@ -1351,7 +1487,7 @@ public class ClaudeTerminalView extends ViewPart {
                                         || (msg.contains("Exit code") && msg.contains("ls:"))
                                         || (msg.contains("Exit code") && msg.contains("No such file or directory"));
                                 if (isBashPathError) {
-                                    appendMeta("  ℹ bash 路徑轉換中，Claude 將改用其他工具繼續…\n");
+                                    appendMeta("  ℹ Path conversion in progress, Claude will use other tools to continue…\n");
                                 } else if (!isInteractivePrompt) {
                                     appendError("Tool error: " + msg);
                                 }
@@ -1404,7 +1540,7 @@ public class ClaudeTerminalView extends ViewPart {
                 // Auto-drain message queue
                 String next = messageQueue.poll();
                 if (next != null) {
-                    appendMeta("  ▶ 自動送出排隊訊息…\n");
+                    appendMeta("  ▶ Sending queued message…\n");
                     dispatchMessage(next);
                 } else {
                     // Show "Claude 已結束" banner
@@ -1424,9 +1560,9 @@ public class ClaudeTerminalView extends ViewPart {
     // ══════════════════════════════════════════════════════════════════════════
 
     private static final String[] THINK_FRAMES = {
-        "  ⠋ 思考中…", "  ⠙ 思考中…", "  ⠹ 思考中…", "  ⠸ 思考中…",
-        "  ⠼ 思考中…", "  ⠴ 思考中…", "  ⠦ 思考中…", "  ⠧ 思考中…",
-        "  ⠇ 思考中…", "  ⠏ 思考中…"
+        "  ⠋ Thinking…", "  ⠙ Thinking…", "  ⠹ Thinking…", "  ⠸ Thinking…",
+        "  ⠼ Thinking…", "  ⠴ Thinking…", "  ⠦ Thinking…", "  ⠧ Thinking…",
+        "  ⠇ Thinking…", "  ⠏ Thinking…"
     };
 
     /** Show the thinking spinner Label and start animating (safe to call from any thread). */
@@ -1496,8 +1632,8 @@ public class ClaudeTerminalView extends ViewPart {
             final String fArg = arg;
             boolean[] allow = {true};
             Display.getDefault().syncExec(() -> {
-                allow[0] = MessageDialog.openQuestion(output.getShell(), "Claude 想要執行",
-                    "  " + fToolName + (fArg.isEmpty()?"":"\n  檔案："+fArg) + "\n\n允許？");
+                allow[0] = MessageDialog.openQuestion(output.getShell(), "Claude wants to run",
+                    "  " + fToolName + (fArg.isEmpty()?"":"\n  File: "+fArg) + "\n\nAllow?");
             });
             try {
                 stdin.write((allow[0] ? "y" : "n").getBytes(StandardCharsets.UTF_8));
@@ -1508,13 +1644,13 @@ public class ClaudeTerminalView extends ViewPart {
         }
     }
 
-    /** Print the "▼ 思考過程" header before the first tool call in a response. */
+    /** Print the "▼ Thinking" header before the first tool call in a response. */
     private void appendToolSectionHeader() {
         Display d = output.getDisplay();
         if (d.isDisposed()) return;
         d.asyncExec(() -> {
             if (output.isDisposed()) return;
-            String hdr = "\n  ▼ 思考過程\n";
+            String hdr = "\n  ▼ Thinking\n";
             int s = output.getCharCount();
             toolSectionStart = s;
             output.append(hdr);
@@ -1526,7 +1662,7 @@ public class ClaudeTerminalView extends ViewPart {
     private void handlePermissionPrompt(String prompt, OutputStream stdin) {
         boolean[] allow = {true};
         Display.getDefault().syncExec(() -> {
-            allow[0] = MessageDialog.openQuestion(output.getShell(), "Claude Permission", prompt + "\n\n允許？");
+            allow[0] = MessageDialog.openQuestion(output.getShell(), "Claude Permission", prompt + "\n\nAllow?");
         });
         try {
             stdin.write((allow[0] ? "y" : "n").getBytes(StandardCharsets.UTF_8));
@@ -1700,7 +1836,7 @@ public class ClaudeTerminalView extends ViewPart {
         if (!stopBtn.isDisposed())       stopBtn.setEnabled(!en);
         if (!newBtn.isDisposed())        newBtn.setEnabled(en);
         if (headerStopBtn != null && !headerStopBtn.isDisposed()) headerStopBtn.setEnabled(!en);
-        if (en && !inputArea.isDisposed()) { inputArea.setFocus(); setPlaceholder(); }
+        if (en && !inputArea.isDisposed()) { inputArea.setFocus(); }
     }
 
     // ══════════════════════════════════════════════════════════════════════════

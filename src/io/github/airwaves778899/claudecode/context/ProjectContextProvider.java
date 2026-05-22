@@ -85,7 +85,7 @@ public final class ProjectContextProvider {
         if (project == null || !project.isOpen()) return "";
 
         StringBuilder sb = new StringBuilder();
-        sb.append("## 專案概覽：").append(project.getName()).append("\n\n");
+        sb.append("## Project Overview: ").append(project.getName()).append("\n\n");
 
         // ── Build tool & dependencies ─────────────────────────────────────────
         try {
@@ -107,7 +107,7 @@ public final class ProjectContextProvider {
         // ── Config files ──────────────────────────────────────────────────────
         List<String> configs = findConfigFiles(project);
         if (!configs.isEmpty()) {
-            sb.append("\n**設定檔：** ").append(String.join(", ", configs)).append("\n");
+            sb.append("\n**Config files:** ").append(String.join(", ", configs)).append("\n");
         }
 
         return sb.toString();
@@ -118,7 +118,7 @@ public final class ProjectContextProvider {
     private static String parseMaven(IFile pom) {
         String content = readFile(pom);
         if (content == null) return "";
-        StringBuilder sb = new StringBuilder("**建置工具：** Maven\n");
+        StringBuilder sb = new StringBuilder("**Build tool:** Maven\n");
 
         // Java version
         String javaVer = extractXmlValue(content, "java.version");
@@ -135,7 +135,7 @@ public final class ProjectContextProvider {
         // Key dependencies
         List<String> deps = extractMavenDeps(content);
         if (!deps.isEmpty()) {
-            sb.append("**主要依賴：** ").append(String.join(", ", deps)).append("\n");
+            sb.append("**Main dependencies:** ").append(String.join(", ", deps)).append("\n");
         }
         return sb.toString();
     }
@@ -160,7 +160,7 @@ public final class ProjectContextProvider {
     private static String parseGradle(IFile gradle) {
         String content = readFile(gradle);
         if (content == null) return "";
-        StringBuilder sb = new StringBuilder("**建置工具：** Gradle\n");
+        StringBuilder sb = new StringBuilder("**Build tool:** Gradle\n");
         // Look for java version
         Matcher m = Pattern.compile("sourceCompatibility\\s*=\\s*['\"]?([\\d.]+)").matcher(content);
         if (m.find()) sb.append("**Java：** ").append(m.group(1)).append("\n");
@@ -175,7 +175,7 @@ public final class ProjectContextProvider {
         if (!src.exists()) src = project.getFolder("src");
         if (!src.exists()) return "";
 
-        StringBuilder sb = new StringBuilder("\n**原始碼結構：**\n");
+        StringBuilder sb = new StringBuilder("\n**Source structure:**\n");
 
         // Collect packages → file count
         Map<String, Integer> packages = new LinkedHashMap<>();
@@ -201,7 +201,7 @@ public final class ProjectContextProvider {
         });
 
         int totalFiles = allFiles.size();
-        sb.append("  총 ").append(totalFiles).append(" 個 .java 檔案\n");
+        sb.append("  Total: ").append(totalFiles).append(" .java file(s)\n");
 
         if (totalFiles <= MAX_FILE_LIST) {
             for (Map.Entry<String, Integer> entry : packages.entrySet()) {
@@ -210,11 +210,11 @@ public final class ProjectContextProvider {
                         .replace("src/", "")
                         .replace("/", ".");
                 sb.append("  ").append(pkg)
-                  .append("  (").append(entry.getValue()).append(" 個類別)\n");
+                  .append("  (").append(entry.getValue()).append(" class(es))\n");
             }
         } else {
             // Too many — just show top-level packages
-            sb.append("  主要套件：\n");
+            sb.append("  Main packages:\n");
             packages.entrySet().stream()
                     .limit(15)
                     .forEach(e -> {
@@ -283,7 +283,7 @@ public final class ProjectContextProvider {
         String content = readFile(file);
         if (content == null) return "";
         return content.length() > maxBytes
-                ? content.substring(0, maxBytes) + "\n// ... [截斷]"
+                ? content.substring(0, maxBytes) + "\n// ... [truncated]"
                 : content;
     }
 }

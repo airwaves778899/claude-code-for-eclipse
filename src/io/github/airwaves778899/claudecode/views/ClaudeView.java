@@ -170,14 +170,14 @@ public class ClaudeView extends ViewPart {
         projectContextButton = new Button(header, SWT.TOGGLE);
         projectContextButton.setText("📁 Project");
         projectContextButton.setToolTipText(
-            "開啟後，每則訊息自動附上專案結構摘要（pom.xml、套件結構等）");
+            "When enabled, each message automatically includes a project structure summary (pom.xml, package structure, etc.)");
         projectContextButton.setLayoutData(
             new GridData(SWT.RIGHT, SWT.CENTER, false, false));
         projectContextButton.addListener(SWT.Selection, e -> {
             includeProjectContext = projectContextButton.getSelection();
             setStatus(includeProjectContext
-                ? "✓  已開啟 Project Context — 每則訊息將附帶專案摘要"
-                : "準備就緒");
+                ? "✓  Project Context enabled — each message will include project summary"
+                : "Ready");
         });
 
         modelLabel = new Label(header, SWT.NONE);
@@ -230,20 +230,20 @@ public class ClaudeView extends ViewPart {
 
         applyCodeButton = new Button(codeActionBar, SWT.PUSH);
         applyCodeButton.setText("Apply to Editor");
-        applyCodeButton.setToolTipText("在編輯器中套用 Claude 建議的程式碼 (Alt+Shift+P)");
+        applyCodeButton.setToolTipText("Apply Claude's suggested code in the editor (Alt+Shift+P)");
         applyCodeButton.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false));
         applyCodeButton.addListener(SWT.Selection, e -> triggerApplyCode());
 
         copyCodeButton = new Button(codeActionBar, SWT.PUSH);
         copyCodeButton.setText("Copy Code");
-        copyCodeButton.setToolTipText("複製最佳程式碼區塊到剪貼簿");
+        copyCodeButton.setToolTipText("Copy best code block to clipboard");
         copyCodeButton.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false));
         copyCodeButton.addListener(SWT.Selection, e -> copyBestCodeBlock());
     }
 
     private void buildStatusBar(Composite parent) {
         statusLabel = new Label(parent, SWT.NONE);
-        statusLabel.setText("準備就緒");
+        statusLabel.setText("Ready");
         statusLabel.setBackground(colorBackground);
         statusLabel.setForeground(colorAccent);
         GridData gd = new GridData(SWT.FILL, SWT.TOP, true, false);
@@ -265,7 +265,7 @@ public class ClaudeView extends ViewPart {
         // Multi-line input
         inputField = new Text(inputArea,
                 SWT.MULTI | SWT.BORDER | SWT.WRAP | SWT.V_SCROLL);
-        inputField.setMessage("輸入問題... (Ctrl+Enter 送出)");
+        inputField.setMessage("Ask a question... (Ctrl+Enter to send)");
         inputField.setFont(monoFont);
         inputField.setForeground(colorTextDark);
         inputField.setBackground(new Color(inputArea.getDisplay(), 255, 255, 255));
@@ -290,14 +290,14 @@ public class ClaudeView extends ViewPart {
         btnCol.setLayoutData(new GridData(SWT.RIGHT, SWT.BOTTOM, false, false));
 
         sendButton = new Button(btnCol, SWT.PUSH);
-        sendButton.setText("  送出  ");
-        sendButton.setToolTipText("送出訊息 (Ctrl+Enter)");
+        sendButton.setText("  Send  ");
+        sendButton.setToolTipText("Send message (Ctrl+Enter)");
         sendButton.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
         sendButton.addListener(SWT.Selection, e -> sendMessage());
 
         clearButton = new Button(btnCol, SWT.PUSH);
-        clearButton.setText("  清除  ");
-        clearButton.setToolTipText("清除對話記錄與歷史");
+        clearButton.setText("  Clear  ");
+        clearButton.setToolTipText("Clear conversation history");
         clearButton.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
         clearButton.addListener(SWT.Selection, e -> clearChat());
     }
@@ -319,7 +319,7 @@ public class ClaudeView extends ViewPart {
         Display display = Display.getDefault();
         safeUiExec(display, () -> {
             if (isBusy) {
-                appendSystemMessage("⚠  Claude 目前忙碌中，請稍後再試。");
+                appendSystemMessage("⚠  Claude is busy, please wait.");
                 return;
             }
             if (autoSend) {
@@ -348,10 +348,10 @@ public class ClaudeView extends ViewPart {
         if (cliPath == null || cliPath.isBlank()) cliPath = "claude";
         if (!ClaudeCliClient.isCliAvailable(cliPath)) {
             appendSystemMessage(
-                "⚠  找不到 Claude Code CLI\n" +
-                "請先安裝：npm install -g @anthropic-ai/claude-code\n" +
-                "然後執行 claude 完成登入，再於\n" +
-                "Window > Preferences > Claude Code 確認 CLI 路徑。");
+                "⚠  Claude Code CLI not found\n" +
+                "Please install: npm install -g @anthropic-ai/claude-code\n" +
+                "Then run claude to log in, and check the CLI path at\n" +
+                "Window > Preferences > Claude Code.");
             return;
         }
 
@@ -375,7 +375,7 @@ public class ClaudeView extends ViewPart {
 
         // Append user bubble (show original text without project context prefix)
         conversationHistory.add(new ChatMessage("user", text));
-        appendBubble("您", inputField.getText().isBlank()
+        appendBubble("You", inputField.getText().isBlank()
                 ? text.contains("---") ? text.substring(text.indexOf("---") + 4).trim() : text
                 : inputField.getText(), BubbleType.USER);
 
@@ -414,7 +414,7 @@ public class ClaudeView extends ViewPart {
                 safeUiExec(display, () -> {
                     chatHistory.append("\n");
                     scrollToBottom();
-                    setStatus("準備就緒  ·  " + tokenEstimate(fullText));
+                    setStatus("Ready  ·  " + tokenEstimate(fullText));
                     setBusy(false);
                     // Show/update code action bar
                     updateCodeActionBar(blocks);
@@ -426,7 +426,7 @@ public class ClaudeView extends ViewPart {
                 safeUiExec(display, () -> {
                     chatHistory.append("\n");
                     appendSystemMessage("✕  " + e.getMessage());
-                    setStatus("發生錯誤");
+                    setStatus("Error");
                     setBusy(false);
                 });
             }
@@ -438,7 +438,7 @@ public class ClaudeView extends ViewPart {
         conversationHistory.clear();
         lastCodeBlocks = Collections.emptyList();
         chatHistory.setText("");
-        setStatus("對話已清除");
+        setStatus("Conversation cleared");
         updateCodeActionBar(Collections.emptyList());
     }
 
@@ -459,7 +459,7 @@ public class ClaudeView extends ViewPart {
             int count = lastCodeBlocks.size();
             String lang = lastCodeBlocks.get(0).getLanguage();
             codeActionLabel.setText(
-                "💡  Claude 建議了 " + count + " 段程式碼 (" + lang + ")");
+                "💡  Claude suggested " + count + " code block(s) (" + lang + ")");
         }
         // Re-layout the parent to expand/collapse the bar
         codeActionBar.getParent().layout(true, true);
@@ -472,7 +472,7 @@ public class ClaudeView extends ViewPart {
                 .getService(org.eclipse.ui.handlers.IHandlerService.class)
                 .executeCommand("io.github.airwaves778899.claudecode.commands.applyCode", null);
         } catch (Exception e) {
-            appendSystemMessage("⚠  無法開啟 Apply 對話框：" + e.getMessage());
+            appendSystemMessage("⚠  Cannot open Apply dialog: " + e.getMessage());
         }
     }
 
@@ -491,7 +491,7 @@ public class ClaudeView extends ViewPart {
             new org.eclipse.swt.dnd.Transfer[]{
                 org.eclipse.swt.dnd.TextTransfer.getInstance() });
         cb.dispose();
-        setStatus("✓  已複製程式碼到剪貼簿");
+        setStatus("✓  Code copied to clipboard");
     }
 
     /**
@@ -525,7 +525,7 @@ public class ClaudeView extends ViewPart {
     }
 
     private void appendSystemMessage(String message) {
-        appendBubble("系統", message, BubbleType.SYSTEM);
+        appendBubble("System", message, BubbleType.SYSTEM);
     }
 
     private void applyHeaderStyle(int start, int length, BubbleType type) {
@@ -566,7 +566,7 @@ public class ClaudeView extends ViewPart {
         if (!chatHistory.isDisposed()) {
             sendButton.setEnabled(!busy);
             inputField.setEnabled(!busy);
-            setStatus(busy ? "Claude 思考中..." : "準備就緒");
+            setStatus(busy ? "Claude is thinking..." : "Ready");
             if (!busy) inputField.setFocus();
         }
     }
@@ -594,17 +594,17 @@ public class ClaudeView extends ViewPart {
         appendSystemMessage(
             "Claude Code for Eclipse  v1.0\n\n" +
             (cliOk
-                ? "✓  Claude CLI 已就緒  " + (version.isEmpty() ? "" : "(" + version + ")") + "\n" +
-                  "  請輸入您的問題開始對話。\n\n" +
-                  "  • Ctrl+Enter    送出訊息\n" +
-                  "  • Alt+Shift+C   重新開啟此面板\n" +
-                  "  • Alt+Shift+E   解釋選取程式碼\n" +
-                  "  • Alt+Shift+F   修正/改善程式碼"
-                : "⚠  找不到 Claude Code CLI。\n\n" +
-                  "  安裝步驟：\n" +
+                ? "✓  Claude CLI ready  " + (version.isEmpty() ? "" : "(" + version + ")") + "\n" +
+                  "  Type your question to start.\n\n" +
+                  "  • Ctrl+Enter    Send message\n" +
+                  "  • Alt+Shift+C   Reopen this panel\n" +
+                  "  • Alt+Shift+E   Explain selected code\n" +
+                  "  • Alt+Shift+F   Fix/improve code"
+                : "⚠  Claude Code CLI not found.\n\n" +
+                  "  Setup steps:\n" +
                   "  1. npm install -g @anthropic-ai/claude-code\n" +
-                  "  2. 在終端執行 claude（開啟瀏覽器登入 Team 帳號）\n" +
-                  "  3. Window > Preferences > Claude Code 確認路徑")
+                  "  2. Run claude in a terminal (browser will open to log in)\n" +
+                  "  3. Check the path at Window > Preferences > Claude Code")
         );
     }
 

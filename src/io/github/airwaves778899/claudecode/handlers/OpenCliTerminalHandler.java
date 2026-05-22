@@ -1,47 +1,38 @@
-package io.github.airwaves778899.claudecode.actions;
+package io.github.airwaves778899.claudecode.handlers;
 
 import java.io.File;
 
+import org.eclipse.core.commands.AbstractHandler;
+import org.eclipse.core.commands.ExecutionEvent;
+import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.ui.IObjectActionDelegate;
-import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.handlers.HandlerUtil;
 
 import io.github.airwaves778899.claudecode.Activator;
 import io.github.airwaves778899.claudecode.terminal.TerminalLauncher;
 
 /**
- * Right-click action for IProject: opens Claude CLI in a real terminal window
- * (Windows Terminal if available, otherwise cmd.exe) at the project directory.
+ * Command handler for "Open Claude CLI Terminal".
+ * Opens a real terminal window (Windows Terminal / cmd.exe) at the selected
+ * project directory and launches the Claude CLI.
  */
-public class OpenClaudeCliTerminalAction implements IObjectActionDelegate {
-
-    private ISelection currentSelection;
-    private IWorkbenchPart activePart;
+public class OpenCliTerminalHandler extends AbstractHandler {
 
     @Override
-    public void setActivePart(IAction action, IWorkbenchPart targetPart) {
-        this.activePart = targetPart;
-    }
+    public Object execute(ExecutionEvent event) throws ExecutionException {
 
-    @Override
-    public void selectionChanged(IAction action, ISelection selection) {
-        this.currentSelection = selection;
-    }
+        ISelection sel = HandlerUtil.getCurrentSelection(event);
+        if (!(sel instanceof IStructuredSelection)) return null;
 
-    @Override
-    public void run(IAction action) {
-        if (!(currentSelection instanceof IStructuredSelection)) return;
-        Object first = ((IStructuredSelection) currentSelection).getFirstElement();
+        Object first = ((IStructuredSelection) sel).getFirstElement();
         String projectPath = resolveProjectPath(first);
-        if (projectPath == null) return;
+        if (projectPath == null) return null;
 
-        // Resolve claude CLI path from preferences, fallback to "claude" on PATH
         String cliPath = Activator.getDefault()
                 .getPreferenceStore().getString(Activator.PREF_CLI_PATH).trim();
         if (cliPath.isEmpty()) cliPath = "claude";
@@ -50,10 +41,11 @@ public class OpenClaudeCliTerminalAction implements IObjectActionDelegate {
             TerminalLauncher.launch(projectPath, cliPath);
         } catch (Exception e) {
             MessageDialog.openError(
-                activePart.getSite().getShell(),
+                HandlerUtil.getActiveShell(event),
                 "Claude CLI",
                 "Cannot open terminal: " + e.getMessage());
         }
+        return null;
     }
 
     private static String resolveProjectPath(Object element) {

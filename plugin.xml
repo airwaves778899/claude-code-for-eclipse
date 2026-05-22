@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
 
@@ -17,6 +17,12 @@
          id="io.github.airwaves778899.claudecode.commands.openChatViewForProject"
          name="Open Claude Chat Here"
          description="Open Claude Chat view at selected project">
+      </command>
+
+      <command
+         id="io.github.airwaves778899.claudecode.commands.openCliTerminal"
+         name="Open Claude CLI Terminal"
+         description="Open a terminal window with Claude CLI at the selected project">
       </command>
 
       <command
@@ -40,6 +46,11 @@
       <handler
          commandId="io.github.airwaves778899.claudecode.commands.openChatViewForProject"
          class="io.github.airwaves778899.claudecode.handlers.OpenChatViewForProjectHandler">
+      </handler>
+
+      <handler
+         commandId="io.github.airwaves778899.claudecode.commands.openCliTerminal"
+         class="io.github.airwaves778899.claudecode.handlers.OpenCliTerminalHandler">
       </handler>
 
       <handler
@@ -69,7 +80,7 @@
    </extension>
 
    <!-- ============================================================ -->
-   <!--  Menus (toolbar + menu bar)                                  -->
+   <!--  Menus (toolbar + menu bar + editor right-click)            -->
    <!-- ============================================================ -->
    <extension point="org.eclipse.ui.menus">
 
@@ -78,7 +89,7 @@
          <toolbar id="io.github.airwaves778899.claudecode.toolbar">
             <command
                commandId="io.github.airwaves778899.claudecode.commands.openChatView"
-               icon="icons/claude.png"
+               icon="icons/claude16.png"
                tooltip="Open Claude Chat  (Alt+Shift+C)">
             </command>
          </toolbar>
@@ -90,17 +101,18 @@
             <command
                commandId="io.github.airwaves778899.claudecode.commands.openChatView"
                label="Open Claude Chat  (Alt+Shift+C)"
-               icon="icons/claude.png">
+               icon="icons/claude16.png">
             </command>
          </menu>
       </menuContribution>
 
-      <!-- Editor right-click context menu: Ask Claude about selection -->
+      <!-- Editor right-click: "Ask Claude about selection" -->
       <menuContribution locationURI="popup:org.eclipse.ui.popup.any?after=additions">
+         <separator name="claudeEditorTopSep" visible="true"/>
          <command
             commandId="io.github.airwaves778899.claudecode.commands.askClaudeAboutSelection"
             label="Ask Claude about selection"
-            icon="icons/claude.png"
+            icon="icons/claude16.png"
             style="push">
             <visibleWhen checkEnabled="false">
                <with variable="activeEditor">
@@ -108,38 +120,51 @@
                </with>
             </visibleWhen>
          </command>
+         <separator name="claudeEditorBottomSep" visible="true"/>
       </menuContribution>
 
    </extension>
 
    <!-- ============================================================ -->
-   <!--  Popup Menus (Package/Project Explorer)                      -->
+   <!--  Popup Menus (Package/Project Explorer) — all Claude items  -->
    <!-- ============================================================ -->
    <extension point="org.eclipse.ui.popupMenus">
 
       <!--
-         adaptable="true"  is essential: Package/Project Explorer nodes
-         are IAdaptable objects, not IProject directly.  Without this
-         flag Eclipse skips the adapter chain and never matches.
+         objectContribution is the reliable way to contribute to the
+         Project/Package Explorer context menu for IProject nodes.
+         adaptable="true" lets Eclipse traverse the adapter chain.
+         All three Claude actions are grouped here with visible separators.
       -->
       <objectContribution
          id="io.github.airwaves778899.claudecode.projectPopup"
          objectClass="org.eclipse.core.resources.IProject"
          adaptable="true">
+
          <action
             id="io.github.airwaves778899.claudecode.action.openChatHere"
             label="Open Claude Chat Here"
-            icon="icons/claude.png"
+            icon="icons/claude16.png"
             class="io.github.airwaves778899.claudecode.actions.OpenChatViewAction"
             enablesFor="+">
          </action>
+
          <action
             id="io.github.airwaves778899.claudecode.action.openCliTerminal"
             label="Open Claude CLI Terminal"
-            icon="icons/claude.png"
+            icon="icons/claude16.png"
             class="io.github.airwaves778899.claudecode.actions.OpenClaudeCliTerminalAction"
             enablesFor="1">
          </action>
+
+         <action
+            id="io.github.airwaves778899.claudecode.action.askClaude"
+            label="Ask Claude about selection"
+            icon="icons/claude16.png"
+            class="io.github.airwaves778899.claudecode.actions.AskClaudeProjectAction"
+            enablesFor="+">
+         </action>
+
       </objectContribution>
 
    </extension>
