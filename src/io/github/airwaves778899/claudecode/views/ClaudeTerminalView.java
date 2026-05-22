@@ -1835,11 +1835,29 @@ public class ClaudeTerminalView extends ViewPart {
             colToolOther  = new Color(d,  80,  80, 180);
             colUserBg     = new Color(d, 235, 242, 255);  // light blue tint for user message
         }
-        monoFont = new Font(d, "Consolas",  12, SWT.NORMAL);  // code / input
-        chatFont = new Font(d, "Segoe UI",  13, SWT.NORMAL);  // chat output (proportional)
-        boldFont = new Font(d, "Segoe UI",  13, SWT.BOLD);    // headers / buttons
+        // Chat panel fonts — prefer Cascadia Code for mono, Segoe UI Variable for prose
+        monoFont = newBestFont(d, new String[]{"Cascadia Code", "Consolas", "Courier New"}, 12, SWT.NORMAL);
+        chatFont = newBestFont(d, new String[]{"Segoe UI Variable Text", "Segoe UI", "Arial"}, 14, SWT.NORMAL);
+        boldFont = newBestFont(d, new String[]{"Segoe UI Variable Text", "Segoe UI", "Arial"}, 14, SWT.BOLD);
         mdColors = new MarkdownRenderer.Colors(colText, colHeading, colText, colItalic,
                                                colCode, colCodeBg, colMeta, monoFont);
+    }
+
+    /**
+     * Returns a Font using the first available name from the candidates list.
+     * Falls back to the system default if none match.
+     */
+    private static Font newBestFont(Display d, String[] candidates, int size, int style) {
+        java.util.Set<String> available = new java.util.HashSet<>(
+            java.util.Arrays.asList(d.getFontList(null, true))
+                            .stream()
+                            .map(fd -> fd.getName())
+                            .collect(java.util.stream.Collectors.toSet()));
+        for (String name : candidates) {
+            if (available.contains(name)) return new Font(d, name, size, style);
+        }
+        // fallback: use first candidate anyway (SWT will substitute)
+        return new Font(d, candidates[candidates.length - 1], size, style);
     }
 
     @Override

@@ -71,8 +71,19 @@ public final class TerminalLauncher {
     private static void tryCmdFallback(String workDir, String claude,
                                         String arg, java.util.List<String> addDirs)
             throws IOException {
-        String inner = "cd /d \"" + workDir + "\" && " + buildClaudeCmd(claude, arg, addDirs);
-        new ProcessBuilder("cmd.exe", "/c", "start", "cmd.exe", "/k", inner).start();
+        // Prefer PowerShell (better font rendering) over legacy cmd.exe
+        String claudeCmd = buildClaudeCmd(claude, arg, addDirs);
+        String psCmd = "Set-Location '" + workDir.replace("'", "''") + "'; " + claudeCmd;
+        try {
+            new ProcessBuilder(
+                "powershell.exe", "-NoExit",
+                "-Command", psCmd
+            ).start();
+        } catch (IOException ex) {
+            // Ultimate fallback: cmd.exe
+            String inner = "cd /d \"" + workDir + "\" && " + claudeCmd;
+            new ProcessBuilder("cmd.exe", "/c", "start", "cmd.exe", "/k", inner).start();
+        }
     }
 
     /** Build: claude ["arg"] [--add-dir "dir1" --add-dir "dir2" ...] */
